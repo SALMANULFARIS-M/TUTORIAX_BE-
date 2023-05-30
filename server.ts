@@ -1,5 +1,4 @@
 declare module 'express';
-
 import express, { Application, Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -23,6 +22,7 @@ app.use(
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(express.json());
+
 
   mongoose
   .connect(process.env.MONGODBSERVER as string)
