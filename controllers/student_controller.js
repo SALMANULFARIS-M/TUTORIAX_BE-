@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.InsertStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -45,7 +46,7 @@ const InsertStudent = async (req, res, next) => {
                     httpOnly: true,
                     maxAge: 48 * 60 * 60 * 1000,
                 });
-                // return success
+                // return success and give response the jwt token
                 res.status(200).json({ token: student.token, status: true });
             }
             else {
@@ -60,3 +61,4 @@ const InsertStudent = async (req, res, next) => {
         res.status(400).json({ message: "Something went wrong", status: true });
     }
 };
+exports.InsertStudent = InsertStudent;

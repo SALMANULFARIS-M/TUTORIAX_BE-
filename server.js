@@ -4,6 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const student_routes_1 = __importDefault(require("./routes/student_routes"));
+const admin_routes_1 = __importDefault(require("./routes/admin_routes"));
+const teacher_routes_1 = __importDefault(require("./routes/teacher_routes"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
@@ -21,6 +24,9 @@ app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
+app.use("/", student_routes_1.default);
+app.use("/admin", admin_routes_1.default);
+app.use("/teacher", teacher_routes_1.default);
 mongoose_1.default
     .connect(process.env.MONGODBSERVER)
     .then(() => {

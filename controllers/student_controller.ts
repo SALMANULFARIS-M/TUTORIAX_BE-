@@ -16,7 +16,7 @@ const securePassword = async (password: string): Promise<string> => {
 };
 
 //Insert a new Student  --signup page
-const InsertStudent =async (req:Request,res:Response,next:NextFunction) => {
+export const InsertStudent =async (req:Request,res:Response,next:NextFunction) => {
     try {
         const data = await Student.findOne({ email: req.body.email });
         if (data) {

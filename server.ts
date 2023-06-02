@@ -1,5 +1,8 @@
 declare module 'express';
 import express, { Application, Request, Response, NextFunction } from "express";
+import studentRoutes from "./routes/student_routes";
+import adminRoutes from "./routes/admin_routes";
+import teacherRoutes  from "./routes/teacher_routes";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -22,7 +25,9 @@ app.use(
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(express.json());
-
+  app.use("/", studentRoutes);
+  app.use("/admin", adminRoutes);
+  app.use("/teacher",teacherRoutes)
 
   mongoose
   .connect(process.env.MONGODBSERVER as string)
