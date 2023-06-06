@@ -67,7 +67,7 @@ export const insertStudent = async (req: Request, res: Response, next: NextFunct
       );
       student.token = token;
       if (student.token) {
-        res.cookie("jwt", token, {
+        res.cookie("studentjwt", token, {
           httpOnly: true,
           maxAge: 48 * 60 * 60 * 1000,
         });
@@ -100,7 +100,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
             expiresIn: "2d",
           }
         );
-        res.cookie("jwt", token, {
+        res.cookie("studentjwt", token, {
           httpOnly: true,
           maxAge: 48 * 60 * 60 * 1000,
         });
@@ -115,6 +115,6 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       });
     }
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: true });
+    res.status(400).json({ message: "Something went wrong", status: false });
   }
 };

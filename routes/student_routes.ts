@@ -4,7 +4,7 @@ import path from 'path';
 
 const router = Router();
 
-router.post('/checkuser', checkStudent);
+router.post('/checkstudent', checkStudent);
 router.post('/register', insertStudent);
 router.post('/login',verifyLogin );
 
