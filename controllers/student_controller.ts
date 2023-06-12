@@ -18,22 +18,21 @@ const securePassword = async (password: string): Promise<string> => {
 //check the Student already exist
 export const checkStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log(req.body);
 
+    
     const mobile = parseInt(req.body.mobile)
-    const data = await Student.findOne({ mobile: req.body.mobile });
+    const data = await Student.findOne({ mobile: mobile });
     if (data) {
       res
         .status(201)
-        .send({ message: "Student Already Registered", status: false });
+        .send({ message: "Student Already Registered", status: false,number: req.body.mobile });
     } else {
       // return success and give response true to send otp
       res.status(200).json({ number: req.body.mobile, status: true });
     }
-
   } catch (error) {
     console.log(error);
-    res.status(400).json({ message: "Something went wrong", status: true });
+    res.status(400).json({ message: "Something went wrong" });
   }
 }
 
@@ -118,3 +117,17 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
     res.status(400).json({ message: "Something went wrong", status: false });
   }
 };
+
+
+export const savePassword =async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    console.log(req.body);
+    
+    const mobile = parseInt(req.body.mobile)
+    const psw = await securePassword(req.body.password);
+    await Student.findOneAndUpdate({ mobile: mobile }, { password: psw });
+    res.status(200).json({ message: "success", status: true });
+  } catch (error) {
+    res.status(400).json({ message: "Something went wrong", status: false });
+  }
+}

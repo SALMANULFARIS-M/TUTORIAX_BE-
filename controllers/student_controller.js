@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -20,13 +20,14 @@ const securePassword = async (password) => {
 //check the Student already exist
 const checkStudent = async (req, res, next) => {
     try {
-        console.log(req.body);
+        console.log(req,"sdsa");
+        console.log(req.body,"sdsa");
         const mobile = parseInt(req.body.mobile);
-        const data = await student_model_1.default.findOne({ mobile: req.body.mobile });
+        const data = await student_model_1.default.findOne({ mobile: mobile });
         if (data) {
             res
                 .status(201)
-                .send({ message: "Student Already Registered", status: false });
+                .send({ message: "Student Already Registered", status: false, number: req.body.mobile });
         }
         else {
             // return success and give response true to send otp
@@ -35,7 +36,7 @@ const checkStudent = async (req, res, next) => {
     }
     catch (error) {
         console.log(error);
-        res.status(400).json({ message: "Something went wrong", status: true });
+        res.status(400).json({ message: "Something went wrong" });
     }
 };
 exports.checkStudent = checkStudent;
@@ -118,3 +119,15 @@ const verifyLogin = async (req, res, next) => {
     }
 };
 exports.verifyLogin = verifyLogin;
+const savePassword = async (req, res, next) => {
+    try {
+        const mobile = parseInt(req.body.mobile);
+        const psw = await securePassword(req.body.password);
+        await student_model_1.default.findOneAndUpdate({ mobile: mobile }, { password: psw });
+        res.status(200).json({ message: "success", status: true });
+    }
+    catch (error) {
+        res.status(400).json({ message: "Something went wrong", status: false });
+    }
+};
+exports.savePassword = savePassword;
