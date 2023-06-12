@@ -20,8 +20,6 @@ const securePassword = async (password) => {
 //check the Student already exist
 const checkStudent = async (req, res, next) => {
     try {
-        console.log(req,"sdsa");
-        console.log(req.body,"sdsa");
         const mobile = parseInt(req.body.mobile);
         const data = await student_model_1.default.findOne({ mobile: mobile });
         if (data) {
@@ -121,6 +119,7 @@ const verifyLogin = async (req, res, next) => {
 exports.verifyLogin = verifyLogin;
 const savePassword = async (req, res, next) => {
     try {
+        console.log(req.body);
         const mobile = parseInt(req.body.mobile);
         const psw = await securePassword(req.body.password);
         await student_model_1.default.findOneAndUpdate({ mobile: mobile }, { password: psw });
