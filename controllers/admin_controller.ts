@@ -54,10 +54,8 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
 
 export const addCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-console.log(req.body);
-
     const title = req.body.title
-    const data = await Student.findOne({ mobile: title });
+    const data = await Course.findOne({ title: title });
     if (data) {
       res
         .status(400)
@@ -69,7 +67,7 @@ console.log(req.body);
         author: req.body.author,
         date: date,
         price: req.body.price,
-        image_id: req.body.thumbnile,
+        image_id: req.body.thumbnail,
         video_id: req.body.video,
         description: req.body.description
       });
@@ -80,6 +78,22 @@ console.log(req.body);
       });
 
     }
+  } catch (error) {
+    res.status(400).json({ message: "Something went wrong", status: false });
+  }
+};
+
+
+export const getAllCourse = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    Course.find().then((result) => {
+      const data = result
+      res.status(200).json({ data, status: true });
+    }).catch((error) => {
+      console.log(error);
+    })
+
   } catch (error) {
     res.status(400).json({ message: "Something went wrong", status: false });
   }

@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Login = exports.verifyLogin = void 0;
+exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
 const admin_model_1 = __importDefault(require("../models/admin_model"));
+const course_model_1 = __importDefault(require("../models/course_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 //Password bcryption
@@ -50,19 +51,49 @@ const verifyLogin = async (req, res, next) => {
     }
 };
 exports.verifyLogin = verifyLogin;
-const Login = async (req, res, next) => {
+const addCourse = async (req, res, next) => {
     try {
-        const email = req.body.email;
-        const password = req.body.password;
-        const psw = await securePassword(password);
-        const student = new admin_model_1.default({
-            email: email,
-            password: psw,
-        });
-        await student.save();
-        res.status(200).json({ status: true });
+        const title = req.body.title;
+        const data = await course_model_1.default.findOne({ title: title });
+        if (data) {
+            res
+                .status(400)
+                .send({ message: "Course Already Exist", status: false });
+        }
+        else {
+            const date = new Date(req.body.date);
+            const course = new course_model_1.default({
+                title: title,
+                author: req.body.author,
+                date: date,
+                price: req.body.price,
+                image_id: req.body.thumbnail,
+                video_id: req.body.video,
+                description: req.body.description
+            });
+            await course.save().then(() => {
+                res.status(200).json({ message: "Successfully added a course", status: true });
+            }).catch(() => {
+                res.status(400).json({ message: "Something went wrong", status: false });
+            });
+        }
     }
     catch (error) {
+        res.status(400).json({ message: "Something went wrong", status: false });
     }
 };
-exports.Login = Login;
+exports.addCourse = addCourse;
+const getAllCourse = async (req, res, next) => {
+    try {
+        course_model_1.default.find().then((result) => {
+            const data = result;
+            res.status(200).json({ data, status: true });
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    catch (error) {
+        res.status(400).json({ message: "Something went wrong", status: false });
+    }
+};
+exports.getAllCourse = getAllCourse;

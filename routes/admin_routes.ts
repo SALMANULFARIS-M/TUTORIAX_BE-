@@ -4,6 +4,6 @@ import path from 'path';
 
 const router = Router();
 router.post('/login',verifyLogin);
-router.post('/login/addcourse',addCourse);
+router.post('/addcourse',addCourse);
 
 export default router;
