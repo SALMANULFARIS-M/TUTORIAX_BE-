@@ -119,7 +119,6 @@ const verifyLogin = async (req, res, next) => {
 exports.verifyLogin = verifyLogin;
 const savePassword = async (req, res, next) => {
     try {
-        console.log(req.body);
         const mobile = parseInt(req.body.mobile);
         const psw = await securePassword(req.body.password);
         await student_model_1.default.findOneAndUpdate({ mobile: mobile }, { password: psw });

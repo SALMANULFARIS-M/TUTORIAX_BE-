@@ -85,8 +85,8 @@ export const addCourse = async (req: Request, res: Response, next: NextFunction)
 
 
 export const getAllCourse = async (req: Request, res: Response, next: NextFunction) => {
+  
   try {
-
     Course.find().then((result) => {
       const data = result
       res.status(200).json({ data, status: true });
