@@ -30,6 +30,10 @@ const studentSchema = new mongoose_1.Schema({
     },
     token: {
         type: String
+    },
+    access: {
+        type: Boolean,
+        default: false
     }
 });
 exports.default = (0, mongoose_1.model)("Student", studentSchema);

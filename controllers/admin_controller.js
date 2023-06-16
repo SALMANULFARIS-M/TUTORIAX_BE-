@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
+exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
 const admin_model_1 = __importDefault(require("../models/admin_model"));
 const course_model_1 = __importDefault(require("../models/course_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -99,7 +99,6 @@ const getAllCourse = async (req, res, next) => {
 exports.getAllCourse = getAllCourse;
 const deleteCourse = async (req, res, next) => {
     try {
-        console.log(req.params.id, "id");
         course_model_1.default.findByIdAndDelete({ _id: req.params.id }).then((result) => {
             console.log(result);
             res.status(200).json({ thumbnailURL: result?.image_id, videoURL: result?.video_id, message: "Successfully deleted", status: true });
@@ -112,3 +111,29 @@ const deleteCourse = async (req, res, next) => {
     }
 };
 exports.deleteCourse = deleteCourse;
+const getCourse = async (req, res, next) => {
+    try {
+        course_model_1.default.findById({ _id: req.params.id }).then((result) => {
+            res.status(200).json({ course: result, status: true });
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    catch (error) {
+        res.status(400).json({ message: "Something went wrong", status: false });
+    }
+};
+exports.getCourse = getCourse;
+const editCourse = async (req, res, next) => {
+    try {
+        course_model_1.default.findByIdAndUpdate({ _id: req.params.id }).then((result) => {
+            res.status(200).json({ course: result, status: true });
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    catch (error) {
+        res.status(400).json({ message: "Something went wrong", status: false });
+    }
+};
+exports.editCourse = editCourse;

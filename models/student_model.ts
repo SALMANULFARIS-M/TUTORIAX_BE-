@@ -7,7 +7,8 @@ interface student extends Document {
     mobile: number;
     password: string;
     image: string;
-    token:string;
+    token: string;
+    access: boolean;
 }
 
 const studentSchema = new Schema<student>({
@@ -37,8 +38,12 @@ const studentSchema = new Schema<student>({
         type: String,
         required: false,
     },
-    token:{
-        type:String
+    token: {
+        type: String
+    },
+    access: {
+        type: Boolean,
+        default: false
     }
 });
 

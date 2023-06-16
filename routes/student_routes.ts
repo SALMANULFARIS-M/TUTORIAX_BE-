@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { checkStudent,insertStudent,verifyLogin,savePassword } from "../controllers/student_controller";
-import path from 'path';
 
 const router = Router();
 

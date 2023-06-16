@@ -7,4 +7,6 @@ router.post('/login', admin_controller_1.verifyLogin);
 router.post('/addcourse', admin_controller_1.addCourse);
 router.get('/getallcourses', admin_controller_1.getAllCourse);
 router.delete('/deletecourse/:id', admin_controller_1.deleteCourse);
+router.get('/getcourse/:id', admin_controller_1.getCourse);
+router.patch('/editcourse/:id', admin_controller_1.editCourse);
 exports.default = router;

@@ -21,15 +21,18 @@ export const checkStudent = async (req: Request, res: Response, next: NextFuncti
     const mobile = parseInt(req.body.mobile)
     const data = await Student.findOne({ mobile: mobile });
     if (data) {
-      res
-        .status(201)
-        .send({ message: "Student Already Registered", status: false,number: req.body.mobile });
+      if (data.access) {
+        res
+          .status(201)
+          .send({ message: "Student Already Registered", status: false, number: req.body.mobile });
+      } else {
+        res.status(201).json({ message: "You are blocked by admin", status: false });
+      }
     } else {
       // return success and give response true to send otp
       res.status(200).json({ number: req.body.mobile, status: true });
     }
   } catch (error) {
-    console.log(error);
     res.status(400).json({ message: "Something went wrong" });
   }
 }
@@ -87,37 +90,41 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
     const mobile: string = req.body.mobile;
     const password: string = req.body.password;
     const studentData = await Student.findOne({ mobile: mobile });
-    if (studentData) {
-      const passwordCheck = await bcrypt.compare(password, studentData.password); // comparing database bcrypt with Student-typed password
-      if (passwordCheck) {
-        const token = await jwt.sign(
-          { student_id: studentData._id, type: "student" },
-          process.env.SECRET_KEY!,
-          {
-            expiresIn: "2d",
-          }
-        );
-        res.cookie("studentjwt", token, {
-          httpOnly: true,
-          maxAge: 48 * 60 * 60 * 1000,
-        });
-        studentData.token = token;
-        res.status(200).json({ token: studentData.token, status: true });
+    if (studentData?.access) {
+      if (studentData) {
+        const passwordCheck = await bcrypt.compare(password, studentData.password); // comparing database bcrypt with Student-typed password
+        if (passwordCheck) {
+          const token = await jwt.sign(
+            { student_id: studentData._id, type: "student" },
+            process.env.SECRET_KEY!,
+            {
+              expiresIn: "2d",
+            }
+          );
+          res.cookie("studentjwt", token, {
+            httpOnly: true,
+            maxAge: 48 * 60 * 60 * 1000,
+          });
+          studentData.token = token;
+          res.status(200).json({ token: studentData.token, status: true });
+        } else {
+          res.status(400).send({ message: "Password is incorrect!" });
+        }
       } else {
-        res.status(400).send({ message: "Password is incorrect!" });
+        res.status(400).send({
+          message: "E-mail is not registered! Please signup to continue..",
+        });
       }
     } else {
-      res.status(400).send({
-        message: "E-mail is not registered! Please signup to continue..",
-      });
+      res.status(201).json({ message: "You are blocked by admin", status: false });
     }
   } catch (error) {
     res.status(400).json({ message: "Something went wrong", status: false });
   }
 };
 
-export const savePassword =async (req: Request, res: Response, next: NextFunction) => {
-  try {  
+export const savePassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
     const mobile = parseInt(req.body.mobile)
     const psw = await securePassword(req.body.password);
     await Student.findOneAndUpdate({ mobile: mobile }, { password: psw });

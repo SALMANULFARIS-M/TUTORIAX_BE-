@@ -23,9 +23,14 @@ const checkStudent = async (req, res, next) => {
         const mobile = parseInt(req.body.mobile);
         const data = await student_model_1.default.findOne({ mobile: mobile });
         if (data) {
-            res
-                .status(201)
-                .send({ message: "Student Already Registered", status: false, number: req.body.mobile });
+            if (data.access) {
+                res
+                    .status(201)
+                    .send({ message: "Student Already Registered", status: false, number: req.body.mobile });
+            }
+            else {
+                res.status(201).json({ message: "You are blocked by admin", status: false });
+            }
         }
         else {
             // return success and give response true to send otp
@@ -33,7 +38,6 @@ const checkStudent = async (req, res, next) => {
         }
     }
     catch (error) {
-        console.log(error);
         res.status(400).json({ message: "Something went wrong" });
     }
 };
@@ -89,27 +93,32 @@ const verifyLogin = async (req, res, next) => {
         const mobile = req.body.mobile;
         const password = req.body.password;
         const studentData = await student_model_1.default.findOne({ mobile: mobile });
-        if (studentData) {
-            const passwordCheck = await bcrypt_1.default.compare(password, studentData.password); // comparing database bcrypt with Student-typed password
-            if (passwordCheck) {
-                const token = await jsonwebtoken_1.default.sign({ student_id: studentData._id, type: "student" }, process.env.SECRET_KEY, {
-                    expiresIn: "2d",
-                });
-                res.cookie("studentjwt", token, {
-                    httpOnly: true,
-                    maxAge: 48 * 60 * 60 * 1000,
-                });
-                studentData.token = token;
-                res.status(200).json({ token: studentData.token, status: true });
+        if (studentData?.access) {
+            if (studentData) {
+                const passwordCheck = await bcrypt_1.default.compare(password, studentData.password); // comparing database bcrypt with Student-typed password
+                if (passwordCheck) {
+                    const token = await jsonwebtoken_1.default.sign({ student_id: studentData._id, type: "student" }, process.env.SECRET_KEY, {
+                        expiresIn: "2d",
+                    });
+                    res.cookie("studentjwt", token, {
+                        httpOnly: true,
+                        maxAge: 48 * 60 * 60 * 1000,
+                    });
+                    studentData.token = token;
+                    res.status(200).json({ token: studentData.token, status: true });
+                }
+                else {
+                    res.status(400).send({ message: "Password is incorrect!" });
+                }
             }
             else {
-                res.status(400).send({ message: "Password is incorrect!" });
+                res.status(400).send({
+                    message: "E-mail is not registered! Please signup to continue..",
+                });
             }
         }
         else {
-            res.status(400).send({
-                message: "E-mail is not registered! Please signup to continue..",
-            });
+            res.status(201).json({ message: "You are blocked by admin", status: false });
         }
     }
     catch (error) {
