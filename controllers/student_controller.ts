@@ -18,8 +18,6 @@ const securePassword = async (password: string): Promise<string> => {
 //check the Student already exist
 export const checkStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
-    
     const mobile = parseInt(req.body.mobile)
     const data = await Student.findOne({ mobile: mobile });
     if (data) {
@@ -118,7 +116,6 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-
 export const savePassword =async (req: Request, res: Response, next: NextFunction) => {
   try {  
     const mobile = parseInt(req.body.mobile)
@@ -129,3 +126,4 @@ export const savePassword =async (req: Request, res: Response, next: NextFunctio
     res.status(400).json({ message: "Something went wrong", status: false });
   }
 }
+

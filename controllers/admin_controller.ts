@@ -98,3 +98,20 @@ export const getAllCourse = async (req: Request, res: Response, next: NextFuncti
     res.status(400).json({ message: "Something went wrong", status: false });
   }
 };
+
+export const deleteCourse= async (req: Request, res: Response, next: NextFunction) => {
+  
+  try {
+    console.log(req.params.id,"id");
+
+    Course.findByIdAndDelete({_id:req.params.id}).then((result) => {
+      console.log(result);
+      res.status(200).json({ thumbnailURL:result?.image_id,videoURL:result?.video_id,message:"Successfully deleted", status: true });
+    }).catch((error) => {
+      console.log(error);
+    })
+
+  } catch (error) {
+    res.status(400).json({ message: "Something went wrong", status: false });
+  }
+};
