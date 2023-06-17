@@ -48,8 +48,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       });
     }
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
-  }
+    next(error)  }
 };
 
 export const addCourse = async (req: Request, res: Response, next: NextFunction) => {
@@ -79,13 +78,12 @@ export const addCourse = async (req: Request, res: Response, next: NextFunction)
 
     }
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
-  }
+    next(error)  }
 };
 
 
 export const getAllCourse = async (req: Request, res: Response, next: NextFunction) => {
-  
+
   try {
     Course.find().then((result) => {
       const data = result
@@ -95,48 +93,59 @@ export const getAllCourse = async (req: Request, res: Response, next: NextFuncti
     })
 
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
-  }
+    next(error)  }
 };
 
-export const deleteCourse= async (req: Request, res: Response, next: NextFunction) => {
-  
+export const deleteCourse = async (req: Request, res: Response, next: NextFunction) => {
+
   try {
-   Course.findByIdAndDelete({_id:req.params.id}).then((result) => {
+    Course.findByIdAndDelete({ _id: req.params.id }).then((result) => {
       console.log(result);
-      res.status(200).json({ thumbnailURL:result?.image_id,videoURL:result?.video_id,message:"Successfully deleted", status: true });
+      res.status(200).json({ thumbnailURL: result?.image_id, videoURL: result?.video_id, message: "Successfully deleted", status: true });
     }).catch((error) => {
       console.log(error);
     })
 
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
+    next(error)
   }
 };
 
 
-export const getCourse= async (req: Request, res: Response, next: NextFunction) => {
+export const getCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    Course.findById({_id:req.params.id}).then((result) => {
-      res.status(200).json({ course:result, status: true });
+    Course.findById({ _id: req.params.id }).then((result) => {
+      res.status(200).json({ course: result, status: true });
     }).catch((error) => {
       console.log(error);
     })
 
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
+    next(error)
   }
 };
 
-export const editCourse= async (req: Request, res: Response, next: NextFunction) => {
+export const editCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    Course.findByIdAndUpdate({_id:req.params.id}).then((result) => {
-      res.status(200).json({ course:result, status: true });
-    }).catch((error) => {
-      console.log(error);
+    const date = new Date(req.body.date);
+    Course.findByIdAndUpdate(req.params.id, {
+      title: req.body.title,
+      author: req.body.author,
+      date: date,
+      price: req.body.price,
+      image_id: req.body.thumbnail,
+      video_id: req.body.video,
+      description: req.body.description
     })
+      .then((result) => {
+        res.status(200).json({message:"Successfully changed", status: true });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
 
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
+   next(error)
   }
 };

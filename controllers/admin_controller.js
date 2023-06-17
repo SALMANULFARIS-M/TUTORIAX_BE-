@@ -47,7 +47,7 @@ const verifyLogin = async (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.verifyLogin = verifyLogin;
@@ -79,7 +79,7 @@ const addCourse = async (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.addCourse = addCourse;
@@ -93,7 +93,7 @@ const getAllCourse = async (req, res, next) => {
         });
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.getAllCourse = getAllCourse;
@@ -107,7 +107,7 @@ const deleteCourse = async (req, res, next) => {
         });
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.deleteCourse = deleteCourse;
@@ -120,20 +120,31 @@ const getCourse = async (req, res, next) => {
         });
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.getCourse = getCourse;
 const editCourse = async (req, res, next) => {
     try {
-        course_model_1.default.findByIdAndUpdate({ _id: req.params.id }).then((result) => {
-            res.status(200).json({ course: result, status: true });
-        }).catch((error) => {
+        const date = new Date(req.body.date);
+        course_model_1.default.findByIdAndUpdate(req.params.id, {
+            title: req.body.title,
+            author: req.body.author,
+            date: date,
+            price: req.body.price,
+            image_id: req.body.thumbnail,
+            video_id: req.body.video,
+            description: req.body.description
+        })
+            .then((result) => {
+            res.status(200).json({ message: "Successfully changed", status: true });
+        })
+            .catch((error) => {
             console.log(error);
         });
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.editCourse = editCourse;

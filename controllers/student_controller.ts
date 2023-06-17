@@ -33,8 +33,7 @@ export const checkStudent = async (req: Request, res: Response, next: NextFuncti
       res.status(200).json({ number: req.body.mobile, status: true });
     }
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong" });
-  }
+    next(error)  }
 }
 
 //Insert a new Student  --signup page
@@ -81,8 +80,7 @@ export const insertStudent = async (req: Request, res: Response, next: NextFunct
       }
     }
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: true });
-  }
+    next(error)  }
 }
 
 export const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
@@ -119,8 +117,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       res.status(201).json({ message: "You are blocked by admin", status: false });
     }
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
-  }
+    next(error)  }
 };
 
 export const savePassword = async (req: Request, res: Response, next: NextFunction) => {
@@ -130,7 +127,6 @@ export const savePassword = async (req: Request, res: Response, next: NextFuncti
     await Student.findOneAndUpdate({ mobile: mobile }, { password: psw });
     res.status(200).json({ message: "success", status: true });
   } catch (error) {
-    res.status(400).json({ message: "Something went wrong", status: false });
-  }
+    next(error)  }
 }
 

@@ -38,7 +38,7 @@ const checkStudent = async (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong" });
+        next(error);
     }
 };
 exports.checkStudent = checkStudent;
@@ -84,7 +84,7 @@ const insertStudent = async (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: true });
+        next(error);
     }
 };
 exports.insertStudent = insertStudent;
@@ -122,7 +122,7 @@ const verifyLogin = async (req, res, next) => {
         }
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.verifyLogin = verifyLogin;
@@ -134,7 +134,7 @@ const savePassword = async (req, res, next) => {
         res.status(200).json({ message: "success", status: true });
     }
     catch (error) {
-        res.status(400).json({ message: "Something went wrong", status: false });
+        next(error);
     }
 };
 exports.savePassword = savePassword;
