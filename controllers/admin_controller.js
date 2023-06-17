@@ -113,10 +113,11 @@ const deleteCourse = async (req, res, next) => {
 exports.deleteCourse = deleteCourse;
 const getCourse = async (req, res, next) => {
     try {
-        course_model_1.default.findById({ _id: req.params.id }).then((result) => {
+        const id = req.params.id;
+        course_model_1.default.findById(id).then((result) => {
             res.status(200).json({ course: result, status: true });
         }).catch((error) => {
-            console.log(error);
+            console.log(error, "dfds");
         });
     }
     catch (error) {
