@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const mongodb_1 = require("mongodb");
 const mongoose_1 = require("mongoose");
 const studentSchema = new mongoose_1.Schema({
     firstName: {
@@ -28,6 +29,10 @@ const studentSchema = new mongoose_1.Schema({
         type: String,
         required: false,
     },
+    purchased_course: {
+        type: [mongodb_1.ObjectId],
+        required: false,
+    },
     token: {
         type: String
     },
@@ -35,5 +40,7 @@ const studentSchema = new mongoose_1.Schema({
         type: Boolean,
         default: false
     }
+}, {
+    timestamps: true, // Add timestamps fields
 });
 exports.default = (0, mongoose_1.model)("Student", studentSchema);

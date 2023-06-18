@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
+exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
 const admin_model_1 = __importDefault(require("../models/admin_model"));
 const student_model_1 = __importDefault(require("../models/student_model"));
 const course_model_1 = __importDefault(require("../models/course_model"));
@@ -164,3 +164,35 @@ const getAllStudents = async (req, res, next) => {
     }
 };
 exports.getAllStudents = getAllStudents;
+const blockStudent = async (req, res, next) => {
+    try {
+        console.log(req.body,"kljkljkljkl");
+        const flag = req.body.access;
+        if (flag) {
+            console.log("jhjk");
+            student_model_1.default.findByIdAndUpdate(req.params.id, {
+                access: false
+            }).then((result) => {
+                console.log(result);
+                res.status(200).json({ Message: "Blocked the student", status: true });
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+        else {
+            console.log("jhiuoo;ojo';k;ljk");
+            student_model_1.default.findByIdAndUpdate(req.params.id, {
+                access: true
+            }).then((result) => {
+                console.log(result);
+                res.status(200).json({ Message: "Unblocked the student" , status: true });
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.blockStudent = blockStudent;

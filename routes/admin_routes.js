@@ -10,4 +10,5 @@ router.get('/getallcourses', admin_controller_1.getAllCourse);
 router.delete('/deletecourse/:id', admin_controller_1.deleteCourse);
 router.get('/getcourse/:id', admin_controller_1.getCourse);
 router.patch('/editcourse/:id', admin_controller_1.editCourse);
+router.patch('/blockstudent/:id', admin_controller_1.blockStudent);
 exports.default = router;

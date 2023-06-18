@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { Schema, Document, model } from "mongoose";
 
 interface student extends Document {
@@ -7,6 +8,7 @@ interface student extends Document {
     mobile: number;
     password: string;
     image: string;
+    purchased_course: ObjectId[];
     token: string;
     access: boolean;
 }
@@ -38,13 +40,20 @@ const studentSchema = new Schema<student>({
         type: String,
         required: false,
     },
+    purchased_course: {
+        type: [ObjectId],
+        required: false,
+      },
     token: {
         type: String
     },
     access: {
         type: Boolean,
-        default: false
+        default: true
     }
-});
+},
+    {
+        timestamps: true, // Add timestamps fields
+    });
 
 export default model<student>("Student", studentSchema);

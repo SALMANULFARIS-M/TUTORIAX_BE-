@@ -48,7 +48,8 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       });
     }
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 };
 
 export const addCourse = async (req: Request, res: Response, next: NextFunction) => {
@@ -78,7 +79,8 @@ export const addCourse = async (req: Request, res: Response, next: NextFunction)
 
     }
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 };
 
 
@@ -92,7 +94,8 @@ export const getAllCourse = async (req: Request, res: Response, next: NextFuncti
     })
 
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 };
 
 export const deleteCourse = async (req: Request, res: Response, next: NextFunction) => {
@@ -113,11 +116,11 @@ export const deleteCourse = async (req: Request, res: Response, next: NextFuncti
 
 export const getCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id:string = req.params.id
-    Course.findById(id ).then((result) => {
+    const id: string = req.params.id
+    Course.findById(id).then((result) => {
       res.status(200).json({ course: result, status: true });
     }).catch((error) => {
-      console.log(error,"dfds");
+      console.log(error, "dfds");
     })
 
   } catch (error) {
@@ -138,14 +141,14 @@ export const editCourse = async (req: Request, res: Response, next: NextFunction
       description: req.body.description
     })
       .then((result) => {
-        res.status(200).json({message:"Successfully changed", status: true });
+        res.status(200).json({ message: "Successfully changed", status: true });
       })
       .catch((error) => {
         console.log(error);
       });
 
   } catch (error) {
-   next(error)
+    next(error)
   }
 };
 
@@ -160,5 +163,33 @@ export const getAllStudents = async (req: Request, res: Response, next: NextFunc
     })
 
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
+};
+
+export const blockStudent = async (req: Request, res: Response, next: NextFunction) => {
+
+  try {
+    const flag = req.body.access
+    if (flag) {
+      Student.findByIdAndUpdate(req.params.id, {
+        access: false
+      }).then((result) => {
+        res.status(200).json({ Message: "Blocked the student", status: true });
+      }).catch((error) => {
+        console.log(error);
+      })
+
+    } else {
+      Student.findByIdAndUpdate(req.params.id, {
+        access: true
+      }).then((result) => {
+        res.status(200).json({ Message: "Unblocked the student", status: true });
+      }).catch((error) => {
+        console.log(error);
+      })
+    }
+  } catch (error) {
+    next(error)
+  }
 };
