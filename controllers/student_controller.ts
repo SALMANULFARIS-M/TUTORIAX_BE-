@@ -1,6 +1,7 @@
 import Student from "../models/student_model";
+import Order from "../models/order_model";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 import { Request, Response, NextFunction } from "express";
@@ -33,7 +34,8 @@ export const checkStudent = async (req: Request, res: Response, next: NextFuncti
       res.status(200).json({ number: req.body.mobile, status: true });
     }
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 }
 
 //Insert a new Student  --signup page
@@ -80,7 +82,8 @@ export const insertStudent = async (req: Request, res: Response, next: NextFunct
       }
     }
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 }
 
 export const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
@@ -117,16 +120,71 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       res.status(201).json({ message: "You are blocked by admin", status: false });
     }
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 };
 
 export const savePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile = parseInt(req.body.mobile)
-    const psw = await securePassword(req.body.password);
-    await Student.findOneAndUpdate({ mobile: mobile }, { password: psw });
-    res.status(200).json({ message: "success", status: true });
+    const mobile: Number = parseInt(req.body.mobile)
+    const psw: string = await securePassword(req.body.password);
+    await Student.findOneAndUpdate({ mobile: mobile }, { password: psw }).then((result)=>{
+      res.status(200).json({ message: "success", status: true });
+    });
   } catch (error) {
-    next(error)  }
+    next(error)
+  }
 }
 
+export const saveOrder = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token: any = req.params.id
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const userId = decodedToken.student_id;
+    const order = new Order({
+      payment_id: req.body.stripeToken,
+      course_id: req.body.courseId,
+      student_id: userId,
+      amount: req.body.amount
+    });
+    await order.save().then((response) => {
+      Student.findByIdAndUpdate(response.student_id,
+        { $push: { purchased_course: response.course_id } },
+        { new: true }
+      ).then((updatedStudent:any) => {
+        if (updatedStudent) {
+          res.status(200).json({ message: "success" ,id:response.course_id, status: true });
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating purchased course:", error);
+      });
+    });
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const checkPurchased = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const token: any = req.body.token
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const studentId = decodedToken.student_id;
+    Student.findOne({ _id: studentId, purchased_course: req.body.courseId })
+    .then((foundStudent: any) => {
+      if (foundStudent) {
+        res.status(200).json({ message: "Course exists in purchased courses" , status: true });
+      } else {
+        res.status(200).json({ message: "Course does not exist in purchased courses" , status: false });
+      }
+    })
+    .catch((error) => {
+      console.error("Error searching for student:", error);
+    });
+   
+  } catch (error) {
+    next(error)
+  }
+}

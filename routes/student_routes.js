@@ -7,4 +7,6 @@ router.post('/checkstudent', student_controller_1.checkStudent);
 router.post('/register', student_controller_1.insertStudent);
 router.post('/login', student_controller_1.verifyLogin);
 router.post('/savepassword', student_controller_1.savePassword);
+router.post('/payment/:id', student_controller_1.saveOrder);
+router.post('/checkcourse', student_controller_1.checkPurchased);
 exports.default = router;

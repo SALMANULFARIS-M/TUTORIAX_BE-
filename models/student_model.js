@@ -31,6 +31,7 @@ const studentSchema = new mongoose_1.Schema({
     },
     purchased_course: {
         type: [mongodb_1.ObjectId],
+        ref: "Course",
         required: false,
     },
     token: {
@@ -38,7 +39,7 @@ const studentSchema = new mongoose_1.Schema({
     },
     access: {
         type: Boolean,
-        default: false
+        default: true
     }
 }, {
     timestamps: true, // Add timestamps fields

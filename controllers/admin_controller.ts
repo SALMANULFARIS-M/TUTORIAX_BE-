@@ -179,7 +179,6 @@ export const blockStudent = async (req: Request, res: Response, next: NextFuncti
       }).catch((error) => {
         console.log(error);
       })
-
     } else {
       Student.findByIdAndUpdate(req.params.id, {
         access: true

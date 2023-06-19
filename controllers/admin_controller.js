@@ -166,26 +166,21 @@ const getAllStudents = async (req, res, next) => {
 exports.getAllStudents = getAllStudents;
 const blockStudent = async (req, res, next) => {
     try {
-        console.log(req.body,"kljkljkljkl");
         const flag = req.body.access;
         if (flag) {
-            console.log("jhjk");
             student_model_1.default.findByIdAndUpdate(req.params.id, {
                 access: false
             }).then((result) => {
-                console.log(result);
                 res.status(200).json({ Message: "Blocked the student", status: true });
             }).catch((error) => {
                 console.log(error);
             });
         }
         else {
-            console.log("jhiuoo;ojo';k;ljk");
             student_model_1.default.findByIdAndUpdate(req.params.id, {
                 access: true
             }).then((result) => {
-                console.log(result);
-                res.status(200).json({ Message: "Unblocked the student" , status: true });
+                res.status(200).json({ Message: "Unblocked the student", status: true });
             }).catch((error) => {
                 console.log(error);
             });

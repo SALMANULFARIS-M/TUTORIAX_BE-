@@ -42,6 +42,7 @@ const studentSchema = new Schema<student>({
     },
     purchased_course: {
         type: [ObjectId],
+        ref:"Course",
         required: false,
       },
     token: {

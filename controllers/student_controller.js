@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
+const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 //Password bcryption
@@ -130,11 +131,62 @@ const savePassword = async (req, res, next) => {
     try {
         const mobile = parseInt(req.body.mobile);
         const psw = await securePassword(req.body.password);
-        await student_model_1.default.findOneAndUpdate({ mobile: mobile }, { password: psw });
-        res.status(200).json({ message: "success", status: true });
+        await student_model_1.default.findOneAndUpdate({ mobile: mobile }, { password: psw }).then((result) => {
+            res.status(200).json({ message: "success", status: true });
+        });
     }
     catch (error) {
         next(error);
     }
 };
 exports.savePassword = savePassword;
+const saveOrder = async (req, res, next) => {
+    try {
+        const token = req.params.id;
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        const userId = decodedToken.student_id;
+        const order = new order_model_1.default({
+            payment_id: req.body.stripeToken,
+            course_id: req.body.courseId,
+            student_id: userId,
+            amount: req.body.amount
+        });
+        await order.save().then((response) => {
+            student_model_1.default.findByIdAndUpdate(response.student_id, { $push: { purchased_course: response.course_id } }, { new: true }).then((updatedStudent) => {
+                if (updatedStudent) {
+                    res.status(200).json({ message: "success", id: response.course_id, status: true });
+                }
+            })
+                .catch((error) => {
+                console.error("Error updating purchased course:", error);
+            });
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.saveOrder = saveOrder;
+const checkPurchased = async (req, res, next) => {
+    try {
+        const token = req.body.token;
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        const studentId = decodedToken.student_id;
+        student_model_1.default.findOne({ _id: studentId, purchased_course: req.body.courseId })
+            .then((foundStudent) => {
+            if (foundStudent) {
+                res.status(200).json({ message: "Course exists in purchased courses", status: true });
+            }
+            else {
+                res.status(200).json({ message: "Course does not exist in purchased courses", status: false });
+            }
+        })
+            .catch((error) => {
+            console.error("Error searching for student:", error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.checkPurchased = checkPurchased;
