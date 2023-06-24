@@ -27,6 +27,18 @@ app.use(express_1.default.json());
 app.use("/", student_routes_1.default);
 app.use("/admin", admin_routes_1.default);
 app.use("/teacher", teacher_routes_1.default);
+// Handle 404 errors
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Not found' });
+});
+// Handle 500 errors
+app.use((err, req, res, next) => {
+    res.status(500).json({ error: 'Internal server error' });
+});
+// Handle 502 errors
+app.use((err, req, res, next) => {
+    res.status(502).json({ error: 'Bad gateway' });
+});
 mongoose_1.default
     .connect(process.env.MONGODBSERVER)
     .then(() => {

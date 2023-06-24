@@ -3,20 +3,8 @@ import Student from "../models/student_model";
 import Course from "../models/course_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import fs from "fs";
-import path from "path";
 import { Request, Response, NextFunction } from "express";
 
-
-//Password bcryption
-const securePassword = async (password: string): Promise<string> => {
-  try {
-    const passwordHash = await bcrypt.hash(password, 10);
-    return passwordHash;
-  } catch (error) {
-    throw new Error("Something went wrong");
-  }
-};
 
 export const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -40,11 +28,12 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
         adminData.token = token;
         res.status(200).json({ token: adminData.token, status: true });
       } else {
-        res.status(400).send({ message: "Password is incorrect!" });
+        res.status(401).send({ message: "Password is incorrect!",status: true });
       }
     } else {
-      res.status(400).send({
+      res.status(401).send({
         message: "E-mail is not registered! You are not an admin..",
+        status: true
       });
     }
   } catch (error) {
@@ -76,7 +65,6 @@ export const addCourse = async (req: Request, res: Response, next: NextFunction)
       }).catch(() => {
         res.status(400).json({ message: "Something went wrong", status: false });
       });
-
     }
   } catch (error) {
     next(error)
@@ -102,12 +90,10 @@ export const deleteCourse = async (req: Request, res: Response, next: NextFuncti
 
   try {
     Course.findByIdAndDelete({ _id: req.params.id }).then((result) => {
-      console.log(result);
       res.status(200).json({ thumbnailURL: result?.image_id, videoURL: result?.video_id, message: "Successfully deleted", status: true });
     }).catch((error) => {
       console.log(error);
     })
-
   } catch (error) {
     next(error)
   }
