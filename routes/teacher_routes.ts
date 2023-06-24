@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { checkTeacher,insertTeacher } from "../controllers/tutor_controller";
+import { checkTeacher,insertTeacher,verifyLogin } from "../controllers/tutor_controller";
 
 const router = Router();
 
 router.post('/checktutor',checkTeacher)
 router.post('/register',insertTeacher)
-router.post('/login')
+router.post('/login',verifyLogin)
 
 export default router;

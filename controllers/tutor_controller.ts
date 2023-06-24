@@ -121,7 +121,6 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       } else {
         res.status(201).json({ message: "Your Account is not approved", status: false });
       }
-
     } else {
       res.status(400).send({
         message: "E-mail is not registered! Please signup to continue..",
