@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.insertTeacher = exports.checkTeacher = void 0;
+exports.verifyLogin = exports.insertTeacher = exports.checkTeacher = void 0;
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -17,7 +17,7 @@ const securePassword = async (password) => {
         throw new Error("Something went wrong");
     }
 };
-//check the Student already exist
+//check the teacher already exist
 const checkTeacher = async (req, res, next) => {
     try {
         const mobile = parseInt(req.body.mobile);
@@ -70,7 +70,7 @@ const insertTeacher = async (req, res, next) => {
             });
             await teacher.save();
             //jwt token create
-            const token = await jsonwebtoken_1.default.sign({ student_id: teacher._id, type: "tutor" }, process.env.SECRET_KEY, {
+            const token = await jsonwebtoken_1.default.sign({ teacher_id: teacher._id, type: "tutor" }, process.env.SECRET_KEY, {
                 expiresIn: "2d",
             });
             teacher.token = token;
@@ -95,3 +95,46 @@ const insertTeacher = async (req, res, next) => {
     }
 };
 exports.insertTeacher = insertTeacher;
+const verifyLogin = async (req, res, next) => {
+    try {
+        const mobile = req.body.mobile;
+        const password = req.body.password;
+        const teacherData = await teacher_model_1.default.findOne({ mobile: mobile });
+        if (teacherData) {
+            if (teacherData.approval) {
+                if (teacherData?.access) {
+                    const passwordCheck = await bcrypt_1.default.compare(password, teacherData.password); // comparing database bcrypt with teacher-typed password
+                    if (passwordCheck) {
+                        const token = await jsonwebtoken_1.default.sign({ teacher_id: teacherData._id, type: "teacher" }, process.env.SECRET_KEY, {
+                            expiresIn: "2d",
+                        });
+                        res.cookie("teacherjwt", token, {
+                            httpOnly: true,
+                            maxAge: 48 * 60 * 60 * 1000,
+                        });
+                        teacherData.token = token;
+                        res.status(200).json({ token: teacherData.token, status: true });
+                    }
+                    else {
+                        res.status(201).send({ message: "Password is incorrect!" });
+                    }
+                }
+                else {
+                    res.status(201).json({ message: "You are blocked by admin", status: false });
+                }
+            }
+            else {
+                res.status(201).json({ message: "Your Account is not approved", status: false });
+            }
+        }
+        else {
+            res.status(400).send({
+                message: "E-mail is not registered! Please signup to continue..",
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.verifyLogin = verifyLogin;
