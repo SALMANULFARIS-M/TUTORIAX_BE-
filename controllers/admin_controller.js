@@ -9,16 +9,6 @@ const student_model_1 = __importDefault(require("../models/student_model"));
 const course_model_1 = __importDefault(require("../models/course_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-//Password bcryption
-const securePassword = async (password) => {
-    try {
-        const passwordHash = await bcrypt_1.default.hash(password, 10);
-        return passwordHash;
-    }
-    catch (error) {
-        throw new Error("Something went wrong");
-    }
-};
 const verifyLogin = async (req, res, next) => {
     try {
         const email = req.body.email;
@@ -38,12 +28,13 @@ const verifyLogin = async (req, res, next) => {
                 res.status(200).json({ token: adminData.token, status: true });
             }
             else {
-                res.status(400).send({ message: "Password is incorrect!" });
+                res.status(401).send({ message: "Password is incorrect!", status: true });
             }
         }
         else {
-            res.status(400).send({
+            res.status(401).send({
                 message: "E-mail is not registered! You are not an admin..",
+                status: true
             });
         }
     }
@@ -101,7 +92,6 @@ exports.getAllCourse = getAllCourse;
 const deleteCourse = async (req, res, next) => {
     try {
         course_model_1.default.findByIdAndDelete({ _id: req.params.id }).then((result) => {
-            console.log(result);
             res.status(200).json({ thumbnailURL: result?.image_id, videoURL: result?.video_id, message: "Successfully deleted", status: true });
         }).catch((error) => {
             console.log(error);

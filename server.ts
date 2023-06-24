@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use("/", studentRoutes);
 app.use("/admin", adminRoutes);
-app.use("/teacher", teacherRoutes);
+app.use("/tutor", teacherRoutes);
 
 // Handle 404 errors
 app.use((req: Request, res: Response, next: NextFunction) => {

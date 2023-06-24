@@ -26,7 +26,7 @@ app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use("/", student_routes_1.default);
 app.use("/admin", admin_routes_1.default);
-app.use("/teacher", teacher_routes_1.default);
+app.use("/tutor", teacher_routes_1.default);
 // Handle 404 errors
 app.use((req, res, next) => {
     res.status(404).json({ error: 'Not found' });
