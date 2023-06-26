@@ -212,8 +212,11 @@ const chatConnection = async (req, res, next) => {
         const token = req.body.student;
         const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
         const studentId = decodedToken.student_id;
-        const connection = [new mongodb_1.ObjectId(studentId), new mongodb_1.ObjectId(req.body.tutor)];
-        const existingConnection = await chat_connection_1.default.findOne({ connection });
+        const connection = { student: new mongodb_1.ObjectId(studentId), teacher: new mongodb_1.ObjectId(req.body.tutor) };
+        const existingConnection = await chat_connection_1.default.findOne({
+            "connection.student": connection.student,
+            "connection.teacher": connection.teacher
+        });
         if (existingConnection) {
             res.status(200).json({ existingConnection, status: true });
         }
@@ -230,14 +233,14 @@ const chatConnection = async (req, res, next) => {
 exports.chatConnection = chatConnection;
 const getAllChats = async (req, res, next) => {
     try {
-        const id = req.params.id;
-        const connections = await chat_connection_1.default.find({ connection: { $in: [id] } }).sort({ updatedAt: -1 });
-        const otherIds = connections.reduce((acc, connection) => {
-            const filteredIds = connection.connection.filter(connId => connId.toString() !== id);
-            return acc.concat(filteredIds);
-        }, []);
-        const allChats = await chat_connection_1.default.find({ _id: { $in: otherIds } });
-        res.status(200).json({ allChats, connections, success: true });
+        const token = req.params.id;
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        const id = decodedToken.student_id;
+        const connections = await chat_connection_1.default.find({ "connection.student": id }).sort({ updatedAt: -1 }).populate({
+            path: "connection.teacher",
+            model: "Teacher",
+        });
+        res.status(200).json({ connections: connections, status: true });
     }
     catch (error) {
         next(error);

@@ -2,16 +2,16 @@ import { ObjectId } from "mongodb";
 import { Schema, Document, model } from "mongoose";
 
 interface connection extends Document {
-    connection: ObjectId[];
-    last_message:ObjectId;
+    connection: { student: ObjectId; teacher: ObjectId };
+    last_message: ObjectId | null;
 }
 
 const connectionSchema = new Schema<connection>({
-    connection: {
-        type: [ObjectId],
-        required: true,
+   connection: {
+        student: { type: ObjectId, ref: 'Student', required: true },
+        teacher: { type: ObjectId, ref: 'Teacher', required: true },
     },
-    last_message:{
+    last_message: {
         type: ObjectId,
         required: false,
     },

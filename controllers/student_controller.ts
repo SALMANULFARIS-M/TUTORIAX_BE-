@@ -211,12 +211,17 @@ export const chatConnection = async (req: Request, res: Response, next: NextFunc
     const token: any = req.body.student;
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
     const studentId = decodedToken.student_id;
-    const connection: ObjectId[] = [new ObjectId(studentId), new ObjectId(req.body.tutor)];
-    const existingConnection = await Connection.findOne({ connection });
+    const connection: { student: ObjectId; teacher: ObjectId } = 
+      { student: new ObjectId(studentId), teacher: new ObjectId(req.body.tutor) };
+    
+      const existingConnection = await Connection.findOne({
+        "connection.student": connection.student,
+        "connection.teacher": connection.teacher
+      });
     if (existingConnection) {
       res.status(200).json({ existingConnection, status: true });
     } else {
-      const newConnection = new Connection({ connection });
+      const newConnection =new Connection({ connection });
       await newConnection.save();
       res.status(200).json({ newConnection, status: true });
     }
@@ -227,14 +232,15 @@ export const chatConnection = async (req: Request, res: Response, next: NextFunc
 
 export const getAllChats = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = req.params.id;
-    const connections = await Connection.find({ connection: { $in: [id] } }).sort({ updatedAt: -1 })
-    const otherIds: ObjectId[] = connections.reduce((acc, connection) => {
-      const filteredIds: any = connection.connection.filter(connId => connId.toString() !== id);
-      return acc.concat(filteredIds);
-    }, []);
-    const allChats = await Connection.find({ _id: { $in: otherIds } });
-    res.status(200).json({ allChats, connections, success: true });
+    const token: any = req.params.id;
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const id = decodedToken.student_id;
+    const connections = await Connection.find({ "connection.student": id }).sort({ updatedAt: -1 }).populate({
+      path: "connection.teacher",
+      model: "Teacher",
+    });
+    
+    res.status(200).json({ connections:connections, status: true });
   } catch (error) {
     next(error)
   }

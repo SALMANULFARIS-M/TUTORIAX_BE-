@@ -4,8 +4,8 @@ const mongodb_1 = require("mongodb");
 const mongoose_1 = require("mongoose");
 const connectionSchema = new mongoose_1.Schema({
     connection: {
-        type: [mongodb_1.ObjectId],
-        required: true,
+        student: { type: mongodb_1.ObjectId, ref: 'Student', required: true },
+        teacher: { type: mongodb_1.ObjectId, ref: 'Teacher', required: true },
     },
     last_message: {
         type: mongodb_1.ObjectId,
