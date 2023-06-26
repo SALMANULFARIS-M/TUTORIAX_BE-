@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
+const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -190,3 +191,17 @@ const checkPurchased = async (req, res, next) => {
     }
 };
 exports.checkPurchased = checkPurchased;
+const getAllTutors = async (req, res, next) => {
+    try {
+        teacher_model_1.default.find({ approval: true, access: true }).then((result) => {
+            const data = result;
+            res.status(200).json({ data, status: true });
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getAllTutors = getAllTutors;

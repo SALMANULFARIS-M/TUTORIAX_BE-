@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     checkStudent, insertStudent, verifyLogin, savePassword,
-    saveOrder, checkPurchased
+    saveOrder, checkPurchased,getAllTutors
 } from "../controllers/student_controller";
 
 const router = Router();
@@ -12,4 +12,6 @@ router.post('/login', verifyLogin);
 router.post('/savepassword', savePassword)
 router.post('/payment/:id', saveOrder)
 router.post('/checkcourse', checkPurchased)
+router.get('/gettutors',getAllTutors)
+
 export default router;

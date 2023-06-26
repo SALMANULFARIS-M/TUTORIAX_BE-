@@ -1,9 +1,9 @@
 import Student from "../models/student_model";
+import Teacher from "../models/teacher_model";
 import Order from "../models/order_model";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import fs from "fs";
-import path from "path";
+
 import { Request, Response, NextFunction } from "express";
 
 //Password bcryption
@@ -188,3 +188,16 @@ export const checkPurchased = async (req: Request, res: Response, next: NextFunc
     next(error)
   }
 }
+
+export const getAllTutors = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    Teacher.find({ approval: true, access: true }).then((result) => {
+      const data = result
+      res.status(200).json({ data, status: true });
+    }).catch((error) => {
+      console.log(error);
+    })
+  } catch (error) {
+    next(error)
+  }
+};
