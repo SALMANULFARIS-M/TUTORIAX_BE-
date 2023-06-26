@@ -13,5 +13,6 @@ router.post('/savepassword', savePassword)
 router.post('/payment/:id', saveOrder)
 router.post('/checkcourse', checkPurchased)
 router.get('/gettutors',getAllTutors)
+router.post('/connection')
 
 export default router;

@@ -3,12 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.chatContent = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
+const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const mongodb_1 = require("mongodb");
 //Password bcryption
 const securePassword = async (password) => {
     try {
@@ -205,3 +207,29 @@ const getAllTutors = async (req, res, next) => {
     }
 };
 exports.getAllTutors = getAllTutors;
+const chatConnection = async (req, res, next) => {
+    try {
+        const connection = [new mongodb_1.ObjectId(req.body.student), new mongodb_1.ObjectId(req.body.tutor)];
+        const existingConnection = await chat_connection_1.default.findOne({ connection });
+        if (existingConnection) {
+            res.status(200).json({ existingConnection, status: true });
+        }
+        else {
+            const newConnection = new chat_connection_1.default({ connection });
+            await newConnection.save();
+            res.status(200).json({ newConnection, status: true });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.chatConnection = chatConnection;
+const chatContent = async (req, res, next) => {
+    try {
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.chatContent = chatContent;

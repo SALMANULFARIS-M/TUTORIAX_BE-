@@ -1,10 +1,13 @@
 import Student from "../models/student_model";
+import Connection from "../models/chat_connection";
+import Chat from "../models/chat_content";
 import Teacher from "../models/teacher_model";
 import Order from "../models/order_model";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { Request, Response, NextFunction } from "express";
+import { ObjectId } from "mongodb";
 
 //Password bcryption
 const securePassword = async (password: string): Promise<string> => {
@@ -197,6 +200,29 @@ export const getAllTutors = async (req: Request, res: Response, next: NextFuncti
     }).catch((error) => {
       console.log(error);
     })
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const chatConnection = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const connection: ObjectId[] = [new ObjectId(req.body.student), new ObjectId(req.body.tutor)];
+    const existingConnection = await Connection.findOne({ connection });
+    if (existingConnection) {
+      res.status(200).json({ existingConnection, status: true });
+    }else{
+      const newConnection = new Connection({ connection });
+      await newConnection.save();
+      res.status(200).json({ newConnection, status: true });
+    }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const chatContent = async (req: Request, res: Response, next: NextFunction) => {
+  try {
   } catch (error) {
     next(error)
   }

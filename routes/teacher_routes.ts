@@ -7,4 +7,5 @@ router.post('/checktutor',checkTeacher);
 router.post('/register',insertTeacher);
 router.post('/login',verifyLogin);
 
+
 export default router;

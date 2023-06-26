@@ -10,11 +10,14 @@ import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
 import { Server } from 'socket.io';
+import * as http from 'http';
 
 dotenv.config();
-
 const app: Application = express()
-const io: Server = new Server();
+const httpServer = http.createServer(app);
+const io: Server = new Server(httpServer, {
+  cors: { origin: 'http://localhost:4200' },
+});;
 
 app.use(
   cors({
@@ -49,20 +52,13 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 mongoose
   .connect(process.env.MONGODBSERVER as string)
   .then(() => {
-    app.listen(process.env.PORT as string, () => {
+    httpServer.listen(process.env.PORT as string, () => {
       console.log("Database connected and Working On " + process.env.PORT);
     });
   })
   .catch((err: Error) => {
    next(err);
   });
-
-  io.on('connection',(socket)=>{
-    socket.on('join',(data)=>{
-      socket.join(data.room);
-      socket.broadcast.to(data.room).emit('user joined')
-    })
-  })
 
 function next(err: Error) {
   throw new Error("Function not implemented.");
