@@ -10,5 +10,6 @@ router.post('/savepassword', student_controller_1.savePassword);
 router.post('/payment/:id', student_controller_1.saveOrder);
 router.post('/checkcourse', student_controller_1.checkPurchased);
 router.get('/gettutors', student_controller_1.getAllTutors);
-router.post('/connection');
+router.get('/getallchats/:id', student_controller_1.getAllChats);
+router.post('/connection', student_controller_1.chatConnection);
 exports.default = router;

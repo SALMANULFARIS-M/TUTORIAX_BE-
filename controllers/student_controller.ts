@@ -8,7 +8,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 import { Request, Response, NextFunction } from "express";
 import { ObjectId } from "mongodb";
-
 //Password bcryption
 const securePassword = async (password: string): Promise<string> => {
   try {
@@ -62,7 +61,7 @@ export const insertStudent = async (req: Request, res: Response, next: NextFunct
       await student.save();
 
       //jwt token create
-      const token = await jwt.sign(
+      const token = jwt.sign(
         { student_id: student._id, type: "student" },
         process.env.SECRET_KEY!,
         {
@@ -98,7 +97,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       if (studentData) {
         const passwordCheck = await bcrypt.compare(password, studentData.password); // comparing database bcrypt with Student-typed password
         if (passwordCheck) {
-          const token = await jwt.sign(
+          const token = jwt.sign(
             { student_id: studentData._id, type: "student" },
             process.env.SECRET_KEY!,
             {
@@ -131,7 +130,7 @@ export const savePassword = async (req: Request, res: Response, next: NextFuncti
   try {
     const mobile: Number = parseInt(req.body.mobile)
     const psw: string = await securePassword(req.body.password);
-    await Student.findOneAndUpdate({ mobile: mobile }, { password: psw }).then((result)=>{
+    await Student.findOneAndUpdate({ mobile: mobile }, { password: psw }).then((result) => {
       res.status(200).json({ message: "success", status: true });
     });
   } catch (error) {
@@ -154,14 +153,14 @@ export const saveOrder = async (req: Request, res: Response, next: NextFunction)
       Student.findByIdAndUpdate(response.student_id,
         { $push: { purchased_course: response.course_id } },
         { new: true }
-      ).then((updatedStudent:any) => {
+      ).then((updatedStudent: any) => {
         if (updatedStudent) {
-          res.status(200).json({ message: "success" ,id:response.course_id, status: true });
+          res.status(200).json({ message: "success", id: response.course_id, status: true });
         }
       })
-      .catch((error) => {
-        console.error("Error updating purchased course:", error);
-      });
+        .catch((error) => {
+          console.error("Error updating purchased course:", error);
+        });
     });
 
   } catch (error) {
@@ -176,17 +175,17 @@ export const checkPurchased = async (req: Request, res: Response, next: NextFunc
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
     const studentId = decodedToken.student_id;
     Student.findOne({ _id: studentId, purchased_course: req.body.courseId })
-    .then((foundStudent: any) => {
-      if (foundStudent) {
-        res.status(200).json({ message: "Course exists in purchased courses" , status: true });
-      } else {
-        res.status(200).json({ message: "Course does not exist in purchased courses" , status: false });
-      }
-    })
-    .catch((error) => {
-      console.error("Error searching for student:", error);
-    });
-   
+      .then((foundStudent: any) => {
+        if (foundStudent) {
+          res.status(200).json({ message: "Course exists in purchased courses", status: true });
+        } else {
+          res.status(200).json({ message: "Course does not exist in purchased courses", status: false });
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching for student:", error);
+      });
+
   } catch (error) {
     next(error)
   }
@@ -206,16 +205,36 @@ export const getAllTutors = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const chatConnection = async (req: Request, res: Response, next: NextFunction) => {
+
   try {
-    const connection: ObjectId[] = [new ObjectId(req.body.student), new ObjectId(req.body.tutor)];
+
+    const token: any = req.body.student;
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const studentId = decodedToken.student_id;
+    const connection: ObjectId[] = [new ObjectId(studentId), new ObjectId(req.body.tutor)];
     const existingConnection = await Connection.findOne({ connection });
     if (existingConnection) {
       res.status(200).json({ existingConnection, status: true });
-    }else{
+    } else {
       const newConnection = new Connection({ connection });
       await newConnection.save();
       res.status(200).json({ newConnection, status: true });
     }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const getAllChats = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params.id;
+    const connections = await Connection.find({ connection: { $in: [id] } }).sort({ updatedAt: -1 })
+    const otherIds: ObjectId[] = connections.reduce((acc, connection) => {
+      const filteredIds: any = connection.connection.filter(connId => connId.toString() !== id);
+      return acc.concat(filteredIds);
+    }, []);
+    const allChats = await Connection.find({ _id: { $in: otherIds } });
+    res.status(200).json({ allChats, connections, success: true });
   } catch (error) {
     next(error)
   }

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.chatContent = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.chatContent = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
@@ -67,7 +67,7 @@ const insertStudent = async (req, res, next) => {
             });
             await student.save();
             //jwt token create
-            const token = await jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
+            const token = jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
                 expiresIn: "2d",
             });
             student.token = token;
@@ -101,7 +101,7 @@ const verifyLogin = async (req, res, next) => {
             if (studentData) {
                 const passwordCheck = await bcrypt_1.default.compare(password, studentData.password); // comparing database bcrypt with Student-typed password
                 if (passwordCheck) {
-                    const token = await jsonwebtoken_1.default.sign({ student_id: studentData._id, type: "student" }, process.env.SECRET_KEY, {
+                    const token = jsonwebtoken_1.default.sign({ student_id: studentData._id, type: "student" }, process.env.SECRET_KEY, {
                         expiresIn: "2d",
                     });
                     res.cookie("studentjwt", token, {
@@ -209,7 +209,10 @@ const getAllTutors = async (req, res, next) => {
 exports.getAllTutors = getAllTutors;
 const chatConnection = async (req, res, next) => {
     try {
-        const connection = [new mongodb_1.ObjectId(req.body.student), new mongodb_1.ObjectId(req.body.tutor)];
+        const token = req.body.student;
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        const studentId = decodedToken.student_id;
+        const connection = [new mongodb_1.ObjectId(studentId), new mongodb_1.ObjectId(req.body.tutor)];
         const existingConnection = await chat_connection_1.default.findOne({ connection });
         if (existingConnection) {
             res.status(200).json({ existingConnection, status: true });
@@ -225,6 +228,22 @@ const chatConnection = async (req, res, next) => {
     }
 };
 exports.chatConnection = chatConnection;
+const getAllChats = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        const connections = await chat_connection_1.default.find({ connection: { $in: [id] } }).sort({ updatedAt: -1 });
+        const otherIds = connections.reduce((acc, connection) => {
+            const filteredIds = connection.connection.filter(connId => connId.toString() !== id);
+            return acc.concat(filteredIds);
+        }, []);
+        const allChats = await chat_connection_1.default.find({ _id: { $in: otherIds } });
+        res.status(200).json({ allChats, connections, success: true });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getAllChats = getAllChats;
 const chatContent = async (req, res, next) => {
     try {
     }
