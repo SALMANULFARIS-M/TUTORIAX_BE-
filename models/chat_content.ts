@@ -2,12 +2,12 @@ import { ObjectId } from "mongodb";
 import { Schema, Document, model } from "mongoose";
 
 interface connection extends Document {
-    connetion_id:ObjectId;
+    connetion_id: ObjectId;
     from: ObjectId;
     to: ObjectId;
-    content: string;
+    text: string;
 }
-
+const reference = ['Student', 'Teacher'] as const;
 const connectionSchema = new Schema<connection>({
     connetion_id: {
         type: ObjectId,
@@ -16,15 +16,15 @@ const connectionSchema = new Schema<connection>({
     },
     from: {
         type: ObjectId,
-        ref: 'Student',
+        ref: "Student" || "Teacher",
         required: true,
     },
     to: {
         type: ObjectId,
-        ref: 'Teacher',
+        ref: "Student" || "Teacher",
         required: true,
     },
-    content: {
+    text: {
         type: String,
         required: true,
     },

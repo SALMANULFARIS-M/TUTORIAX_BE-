@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.chatContent = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
+const chat_content_1 = __importDefault(require("../models/chat_content"));
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -239,7 +240,7 @@ const getAllChats = async (req, res, next) => {
         const connections = await chat_connection_1.default.find({ "connection.student": id }).sort({ updatedAt: -1 }).populate({
             path: "connection.teacher",
             model: "Teacher",
-        });
+        }).populate('last_message');
         res.status(200).json({ connections: connections, status: true });
     }
     catch (error) {
@@ -247,11 +248,42 @@ const getAllChats = async (req, res, next) => {
     }
 };
 exports.getAllChats = getAllChats;
-const chatContent = async (req, res, next) => {
+const getMessages = async (req, res, next) => {
     try {
+        const id = req.params.id;
+        const room = await chat_connection_1.default.findById(id);
+        const messages = await chat_content_1.default.find({ connetion_id: id }).populate('from').populate('to').populate('connetion_id');
+        res.status(200).json({ messages: messages, status: true, room: room });
     }
     catch (error) {
         next(error);
     }
 };
-exports.chatContent = chatContent;
+exports.getMessages = getMessages;
+const createMessage = async (req, res, next) => {
+    try {
+        const newChatContent = new chat_content_1.default({
+            connetion_id: req.body.connection,
+            from: req.body.sender,
+            to: req.body.receiver,
+            text: req.body.text,
+        });
+        // Save the document to the database
+        newChatContent.save()
+            .then((savedChatContent) => {
+            console.log('New Chat_Content document saved:', savedChatContent);
+            chat_connection_1.default.findByIdAndUpdate(savedChatContent.connetion_id, { last_message: savedChatContent._id }).then((result) => {
+                res.status(200).json({ data: savedChatContent, status: true, result });
+            }).catch((error) => {
+                console.error('Error updating last message:', error);
+            });
+        })
+            .catch((error) => {
+            console.error('Error saving Chat_Content document:', error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.createMessage = createMessage;

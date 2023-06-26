@@ -13,6 +13,8 @@ const connectionSchema = new Schema<connection>({
     },
     last_message: {
         type: ObjectId,
+        ref:'Chat_Content',
+        default:null,
         required: false,
     },
 },

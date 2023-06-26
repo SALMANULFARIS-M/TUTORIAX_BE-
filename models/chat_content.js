@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const mongoose_1 = require("mongoose");
+const reference = ['Student', 'Teacher'];
 const connectionSchema = new mongoose_1.Schema({
     connetion_id: {
         type: mongodb_1.ObjectId,
@@ -10,15 +11,15 @@ const connectionSchema = new mongoose_1.Schema({
     },
     from: {
         type: mongodb_1.ObjectId,
-        ref: 'Student',
+        ref: "Student" || "Teacher",
         required: true,
     },
     to: {
         type: mongodb_1.ObjectId,
-        ref: 'Teacher',
+        ref: "Student" || "Teacher",
         required: true,
     },
-    content: {
+    text: {
         type: String,
         required: true,
     },

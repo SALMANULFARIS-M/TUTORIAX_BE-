@@ -211,17 +211,17 @@ export const chatConnection = async (req: Request, res: Response, next: NextFunc
     const token: any = req.body.student;
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
     const studentId = decodedToken.student_id;
-    const connection: { student: ObjectId; teacher: ObjectId } = 
+    const connection: { student: ObjectId; teacher: ObjectId } =
       { student: new ObjectId(studentId), teacher: new ObjectId(req.body.tutor) };
-    
-      const existingConnection = await Connection.findOne({
-        "connection.student": connection.student,
-        "connection.teacher": connection.teacher
-      });
+
+    const existingConnection = await Connection.findOne({
+      "connection.student": connection.student,
+      "connection.teacher": connection.teacher
+    });
     if (existingConnection) {
       res.status(200).json({ existingConnection, status: true });
     } else {
-      const newConnection =new Connection({ connection });
+      const newConnection = new Connection({ connection });
       await newConnection.save();
       res.status(200).json({ newConnection, status: true });
     }
@@ -238,16 +238,47 @@ export const getAllChats = async (req: Request, res: Response, next: NextFunctio
     const connections = await Connection.find({ "connection.student": id }).sort({ updatedAt: -1 }).populate({
       path: "connection.teacher",
       model: "Teacher",
-    });
-    
-    res.status(200).json({ connections:connections, status: true });
+    }).populate('last_message');
+
+    res.status(200).json({ connections: connections, status: true });
   } catch (error) {
     next(error)
   }
 };
 
-export const chatContent = async (req: Request, res: Response, next: NextFunction) => {
+export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const id = req.params.id
+    const room = await Connection.findById(id)
+    const messages = await Chat.find({ connetion_id: id }).populate('from').populate('to').populate('connetion_id');
+    res.status(200).json({ messages: messages, status: true, room: room });
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const createMessage = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const newChatContent = new Chat({
+      connetion_id: req.body.connection,
+      from: req.body.sender,
+      to: req.body.receiver,
+      text: req.body.text,
+    });
+
+    // Save the document to the database
+    newChatContent.save()
+      .then((savedChatContent) => {
+        console.log('New Chat_Content document saved:', savedChatContent);
+        Connection.findByIdAndUpdate(savedChatContent.connetion_id, { last_message: savedChatContent._id }).then((result:any)=>{
+          res.status(200).json({ data: savedChatContent, status: true,result });
+        }).catch((error) => {
+          console.error('Error updating last message:', error);
+        });
+      })
+      .catch((error) => {
+        console.error('Error saving Chat_Content document:', error);
+      });
   } catch (error) {
     next(error)
   }

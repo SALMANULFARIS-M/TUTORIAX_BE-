@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyLogin = exports.insertTeacher = exports.checkTeacher = void 0;
+exports.getAllChats = exports.verifyLogin = exports.insertTeacher = exports.checkTeacher = void 0;
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 //Password bcryption
 const securePassword = async (password) => {
@@ -138,3 +139,19 @@ const verifyLogin = async (req, res, next) => {
     }
 };
 exports.verifyLogin = verifyLogin;
+const getAllChats = async (req, res, next) => {
+    try {
+        const token = req.params.id;
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        const id = decodedToken.teacher_id;
+        const connections = await chat_connection_1.default.find({ "connection.teacher": id }).sort({ updatedAt: -1 }).populate({
+            path: "connection.student",
+            model: "Student",
+        }).populate('last_message');
+        res.status(200).json({ connections: connections, status: true });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getAllChats = getAllChats;

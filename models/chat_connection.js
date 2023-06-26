@@ -9,6 +9,8 @@ const connectionSchema = new mongoose_1.Schema({
     },
     last_message: {
         type: mongodb_1.ObjectId,
+        ref: 'Chat_Content',
+        default: null,
         required: false,
     },
 }, {

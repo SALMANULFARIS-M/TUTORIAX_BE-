@@ -12,4 +12,6 @@ router.post('/checkcourse', student_controller_1.checkPurchased);
 router.get('/gettutors', student_controller_1.getAllTutors);
 router.get('/getallchats/:id', student_controller_1.getAllChats);
 router.post('/connection', student_controller_1.chatConnection);
+router.get('/getallmessages/:id', student_controller_1.getMessages);
+router.post('/sendmessage', student_controller_1.createMessage);
 exports.default = router;
