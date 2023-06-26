@@ -1,5 +1,6 @@
 import Admin from "../models/admin_model";
 import Student from "../models/student_model";
+import Teacher from "../models/teacher_model";
 import Course from "../models/course_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -139,7 +140,6 @@ export const editCourse = async (req: Request, res: Response, next: NextFunction
 };
 
 export const getAllStudents = async (req: Request, res: Response, next: NextFunction) => {
-
   try {
     Student.find().then((result) => {
       const data = result
@@ -154,7 +154,6 @@ export const getAllStudents = async (req: Request, res: Response, next: NextFunc
 };
 
 export const blockStudent = async (req: Request, res: Response, next: NextFunction) => {
-
   try {
     const flag = req.body.access
     if (flag) {
@@ -174,6 +173,72 @@ export const blockStudent = async (req: Request, res: Response, next: NextFuncti
         console.log(error);
       })
     }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const getAllTutors = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    Teacher.find().then((result) => {
+      const data = result
+      res.status(200).json({ data, status: true });
+    }).catch((error) => {
+      console.log(error);
+    })
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const getTutor = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id: string = req.params.id
+    Teacher.findById(id).then((result) => {
+      res.status(200).json({ tutor: result, status: true });
+    }).catch((error) => {
+      console.log(error, "dfds");
+    })
+
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const blockTutor = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const flag = req.body.access
+    if (flag) {
+      Teacher.findByIdAndUpdate(req.params.id, {
+        access: false
+      }).then((result) => {
+        res.status(200).json({ Message: "Blocked the tutor", status: true });
+      }).catch((error) => {
+        console.log(error);
+      })
+    } else {
+      Teacher.findByIdAndUpdate(req.params.id, {
+        access: true
+      }).then((result) => {
+        res.status(200).json({ Message: "Unblocked the tutor", status: true });
+      }).catch((error) => {
+        console.log(error);
+      })
+    }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const approveTutor = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    Teacher.findByIdAndUpdate(req.params.id, {
+      approval: true
+    }).then((result) => {
+      res.status(200).json({ Message: "Tutor has approved for our website", status: true });
+    }).catch((error) => {
+      console.log(error);
+    })
   } catch (error) {
     next(error)
   }

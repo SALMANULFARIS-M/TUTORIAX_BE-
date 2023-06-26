@@ -9,10 +9,12 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
+import { Server } from 'socket.io';
 
 dotenv.config();
 
-const app: Application = express();
+const app: Application = express()
+const io: Server = new Server();
 
 app.use(
   cors({
@@ -52,5 +54,16 @@ mongoose
     });
   })
   .catch((err: Error) => {
-    console.log(err);
+   next(err);
   });
+
+  io.on('connection',(socket)=>{
+    socket.on('join',(data)=>{
+      socket.join(data.room);
+      socket.broadcast.to(data.room).emit('user joined')
+    })
+  })
+
+function next(err: Error) {
+  throw new Error("Function not implemented.");
+}

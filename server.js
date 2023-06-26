@@ -13,8 +13,10 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const socket_io_1 = require("socket.io");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
+const io = new socket_io_1.Server();
 app.use((0, cors_1.default)({
     credentials: true,
     origin: [process.env.ORIGIN],
@@ -47,5 +49,14 @@ mongoose_1.default
     });
 })
     .catch((err) => {
-    console.log(err);
+    next(err);
 });
+io.on('connection', (socket) => {
+    socket.on('join', (data) => {
+        socket.join(data.room);
+        socket.broadcast.to(data.room).emit('user joined');
+    });
+});
+function next(err) {
+    throw new Error("Function not implemented.");
+}

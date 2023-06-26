@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
+exports.approveTutor = exports.blockTutor = exports.getTutor = exports.getAllTutors = exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
 const admin_model_1 = __importDefault(require("../models/admin_model"));
 const student_model_1 = __importDefault(require("../models/student_model"));
+const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const course_model_1 = __importDefault(require("../models/course_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -181,3 +182,73 @@ const blockStudent = async (req, res, next) => {
     }
 };
 exports.blockStudent = blockStudent;
+const getAllTutors = async (req, res, next) => {
+    try {
+        teacher_model_1.default.find().then((result) => {
+            const data = result;
+            res.status(200).json({ data, status: true });
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getAllTutors = getAllTutors;
+const getTutor = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        teacher_model_1.default.findById(id).then((result) => {
+            res.status(200).json({ tutor: result, status: true });
+        }).catch((error) => {
+            console.log(error, "dfds");
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getTutor = getTutor;
+const blockTutor = async (req, res, next) => {
+    try {
+        const flag = req.body.access;
+        if (flag) {
+            teacher_model_1.default.findByIdAndUpdate(req.params.id, {
+                access: false
+            }).then((result) => {
+                res.status(200).json({ Message: "Blocked the tutor", status: true });
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+        else {
+            teacher_model_1.default.findByIdAndUpdate(req.params.id, {
+                access: true
+            }).then((result) => {
+                res.status(200).json({ Message: "Unblocked the tutor", status: true });
+            }).catch((error) => {
+                console.log(error);
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.blockTutor = blockTutor;
+const approveTutor = async (req, res, next) => {
+    try {
+        teacher_model_1.default.findByIdAndUpdate(req.params.id, {
+            approval: true
+        }).then((result) => {
+            res.status(200).json({ Message: "Tutor has approved for our website", status: true });
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.approveTutor = approveTutor;
