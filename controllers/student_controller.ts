@@ -5,6 +5,7 @@ import Teacher from "../models/teacher_model";
 import Order from "../models/order_model";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import Coupon from "../models/coupon_model";
 
 import { Request, Response, NextFunction } from "express";
 import { ObjectId } from "mongodb";
@@ -149,7 +150,11 @@ export const saveOrder = async (req: Request, res: Response, next: NextFunction)
       student_id: userId,
       amount: req.body.amount
     });
+
     await order.save().then((response) => {
+      if (req.body.coupon) {
+        Student.findByIdAndUpdate(response.student_id, { $push: { couponsApplied: req.body.coupon } }, { new: true }).then((res) => { const response = res })
+      }
       Student.findByIdAndUpdate(response.student_id,
         { $push: { purchased_course: response.course_id } },
         { new: true }
@@ -314,6 +319,110 @@ export const createMessage = async (req: Request, res: Response, next: NextFunct
         console.error('Error saving Chat_Content document:', error);
       });
   } catch (error) {
+    next(error)
+  }
+};
+
+
+export const applyCoupon = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const token: any = req.body.token;
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const id = decodedToken.student_id;
+    const couponCode = req.body.coupon;
+    let total = Number(req.body.price);
+
+    Coupon.findOne(
+      {
+        code: couponCode,
+      }).then(
+        (coupon: any) => {
+          if (coupon) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const exp = coupon.expDate;
+            exp.setHours(0, 0, 0, 0);
+            if (exp.getTime() < today.getTime()) {
+              res.status(200).json({
+                price: total,
+                message: "This coupon is Expired!",
+                discount: 0,
+              });
+            } else {
+              if (total >= coupon.minAmount) {
+                Student.findOne({
+                  _id: id,
+                  couponsApplied: { $in: [coupon._id] }
+                }).then((result) => {
+                  if (result) {
+                    res.status(200).json({
+                      price: total,
+                      message: "This coupon is already used!",
+                      discount: 0,
+                      status: false
+                    });
+                  } else {
+                    let discountPrice =
+                      (total * coupon.discountPercentage) / 100;
+                    if (discountPrice <= coupon.maxDiscount) {
+                      total = Math.round(total - discountPrice);
+                      res.status(200).json({
+                        price: total,
+                        discount: Math.round(discountPrice),
+                        coupon: coupon._id,
+                        status: true
+                      });
+                    } else {
+                      total = Math.round(total - coupon.maxDiscount);
+                      res.status(200).json({
+                        price: total,
+                        discount: coupon.maxDiscount,
+                        coupon: coupon._id,
+                        status: true
+                      });
+                    }
+                  }
+                })
+                  .catch((err) => {
+                    res.status(200).json({
+                      price: total,
+                      message:
+                        "something went wrong while applying coupon! try again later",
+                      discount: 0,
+                      status: false
+                    });
+                  });
+              } else {
+                res.status(200).json({
+                  price: total,
+                  message: "Minimum amount is" + coupon.minAmount,
+                  discount: 0,
+                  status: false
+                });
+              }
+            }
+          } else {
+            res.status(200).json({
+              price: total,
+              message: "coupon not exist",
+              discount: 0,
+              status: false
+            });
+          }
+
+        }).catch((error: any) => {
+          res.status(200).json({
+            price: total, status: false, message:
+              "something went wrong while applying coupon! try again later",
+            discount: 0,
+          });
+        })
+
+
+
+  } catch (error) {
+
     next(error)
   }
 };

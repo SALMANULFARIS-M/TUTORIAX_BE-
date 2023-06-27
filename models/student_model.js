@@ -40,7 +40,11 @@ const studentSchema = new mongoose_1.Schema({
     access: {
         type: Boolean,
         default: true
-    }
+    },
+    couponsApplied: {
+        type: [mongodb_1.ObjectId],
+        required: false,
+    },
 }, {
     timestamps: true, // Add timestamps fields
 });

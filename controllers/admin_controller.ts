@@ -2,6 +2,7 @@ import Admin from "../models/admin_model";
 import Student from "../models/student_model";
 import Teacher from "../models/teacher_model";
 import Course from "../models/course_model";
+import Coupon from "../models/coupon_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
@@ -29,7 +30,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
         adminData.token = token;
         res.status(200).json({ token: adminData.token, status: true });
       } else {
-        res.status(401).send({ message: "Password is incorrect!",status: true });
+        res.status(401).send({ message: "Password is incorrect!", status: true });
       }
     } else {
       res.status(401).send({
@@ -71,7 +72,6 @@ export const addCourse = async (req: Request, res: Response, next: NextFunction)
     next(error)
   }
 };
-
 
 export const getAllCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -239,6 +239,62 @@ export const approveTutor = async (req: Request, res: Response, next: NextFuncti
     }).catch((error) => {
       console.log(error);
     })
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const getCoupons = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await Coupon.find({}).then((result) => {
+      res.status(200).json({ coupons: result, status: true });
+    }).catch((error) => {
+      next(error);
+    });
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const addCoupon = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const name = req.body.code;
+    const existData = await Coupon.findOne({
+      code: { $regex: name, $options: "i" },
+    });
+    if (!existData) {
+      const percentage = req.body.discountPercentage;
+      const max_dis = req.body.maxDiscount;
+      const Amount = req.body.minAmount;
+      const date = new Date(req.body.expDate);
+      const coupon = new Coupon({
+        code: name,
+        discountPercentage: percentage,
+        maxDiscount: max_dis,
+        minAmount: Amount,
+        expDate: date,
+      });
+      await coupon.save().then((result: any) => {
+        res.status(200).json({ coupons: result, status: true });
+      }).catch((error) => {
+        next(error);
+      });;
+    } else {
+      res.status(200).json({ message: "coupon Already Exist", status: false });
+    }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const deleteCoupon = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    await Coupon.findByIdAndDelete({ _id: req.params.id }).then((result: any) => {
+      res.status(200).json({ status: true });
+    }).catch((error) => {
+      next(error);
+    });;;
+
   } catch (error) {
     next(error)
   }

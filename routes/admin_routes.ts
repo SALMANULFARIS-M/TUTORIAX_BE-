@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
     verifyLogin, addCourse, getAllCourse, deleteCourse,
     getCourse,editCourse,getAllStudents,blockStudent,
-    getAllTutors,approveTutor,blockTutor,getTutor
+    getAllTutors,approveTutor,blockTutor,getTutor,
+    getCoupons,addCoupon,deleteCoupon
 } from "../controllers/admin_controller";
 
 const router = Router();
@@ -18,6 +19,8 @@ router.get('/getalltutors', getAllTutors);
 router.get('/gettutor/:id', getTutor);
 router.patch('/blocktutor/:id',blockTutor)
 router.patch('/approvetutor/:id',approveTutor)
-
+router.get('/getcoupons', getCoupons);
+router.post('/addcoupon',addCoupon)
+router.delete('/deletecoupon/:id',deleteCoupon)
 
 export default router;  

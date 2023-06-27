@@ -11,6 +11,7 @@ interface student extends Document {
     purchased_course: ObjectId[];
     token: string;
     access: boolean;
+    couponsApplied: ObjectId[],
 }
 
 const studentSchema = new Schema<student>({
@@ -51,7 +52,12 @@ const studentSchema = new Schema<student>({
     access: {
         type: Boolean,
         default: true
-    }
+    },
+    couponsApplied:{
+        type:[ObjectId],
+        required:false,
+    },
+
 },
     {
         timestamps: true, // Add timestamps fields

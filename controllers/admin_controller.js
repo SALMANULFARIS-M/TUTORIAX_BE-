@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.approveTutor = exports.blockTutor = exports.getTutor = exports.getAllTutors = exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
+exports.deleteCoupon = exports.addCoupon = exports.getCoupons = exports.approveTutor = exports.blockTutor = exports.getTutor = exports.getAllTutors = exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
 const admin_model_1 = __importDefault(require("../models/admin_model"));
 const student_model_1 = __importDefault(require("../models/student_model"));
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const course_model_1 = __importDefault(require("../models/course_model"));
+const coupon_model_1 = __importDefault(require("../models/coupon_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const verifyLogin = async (req, res, next) => {
@@ -252,3 +253,65 @@ const approveTutor = async (req, res, next) => {
     }
 };
 exports.approveTutor = approveTutor;
+const getCoupons = async (req, res, next) => {
+    try {
+        await coupon_model_1.default.find({}).then((result) => {
+            res.status(200).json({ coupons: result, status: true });
+        }).catch((error) => {
+            next(error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getCoupons = getCoupons;
+const addCoupon = async (req, res, next) => {
+    try {
+        const name = req.body.code;
+        const existData = await coupon_model_1.default.findOne({
+            code: { $regex: name, $options: "i" },
+        });
+        if (!existData) {
+            const percentage = req.body.discountPercentage;
+            const max_dis = req.body.maxDiscount;
+            const Amount = req.body.minAmount;
+            const date = new Date(req.body.expDate);
+            const coupon = new coupon_model_1.default({
+                code: name,
+                discountPercentage: percentage,
+                maxDiscount: max_dis,
+                minAmount: Amount,
+                expDate: date,
+            });
+            await coupon.save().then((result) => {
+                res.status(200).json({ coupons: result, status: true });
+            }).catch((error) => {
+                next(error);
+            });
+            ;
+        }
+        else {
+            res.status(200).json({ message: "coupon Already Exist", status: false });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.addCoupon = addCoupon;
+const deleteCoupon = async (req, res, next) => {
+    try {
+        await coupon_model_1.default.findByIdAndDelete({ _id: req.params.id }).then((result) => {
+            res.status(200).json({ status: true });
+        }).catch((error) => {
+            next(error);
+        });
+        ;
+        ;
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.deleteCoupon = deleteCoupon;

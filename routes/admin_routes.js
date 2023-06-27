@@ -15,4 +15,7 @@ router.get('/getalltutors', admin_controller_1.getAllTutors);
 router.get('/gettutor/:id', admin_controller_1.getTutor);
 router.patch('/blocktutor/:id', admin_controller_1.blockTutor);
 router.patch('/approvetutor/:id', admin_controller_1.approveTutor);
+router.get('/getcoupons', admin_controller_1.getCoupons);
+router.post('/addcoupon', admin_controller_1.addCoupon);
+router.delete('/deletecoupon/:id', admin_controller_1.deleteCoupon);
 exports.default = router;
