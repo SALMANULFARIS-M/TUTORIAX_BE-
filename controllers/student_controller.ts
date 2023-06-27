@@ -207,7 +207,6 @@ export const getAllTutors = async (req: Request, res: Response, next: NextFuncti
 export const chatConnection = async (req: Request, res: Response, next: NextFunction) => {
 
   try {
-
     const token: any = req.body.student;
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
     const studentId = decodedToken.student_id;
@@ -239,8 +238,7 @@ export const getAllChats = async (req: Request, res: Response, next: NextFunctio
       path: "connection.teacher",
       model: "Teacher",
     }).populate('last_message');
-
-    res.status(200).json({ connections: connections, status: true });
+    res.status(200).json({ connections: connections, status: true, id: id });
   } catch (error) {
     next(error)
   }
@@ -256,20 +254,21 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
       path: 'connection.teacher',
       model: 'Teacher'
     })
-    const messages = await Chat.find({ connection_id: id }).populate('connection_id') .populate({
+    const messages = await Chat.find({ connection_id: id }).populate('connection_id').populate({
       path: 'connection_id',
       populate: {
         path: 'connection.student',
         model: 'Student'
       }
     })
-    .populate({
-      path: 'connection_id',
-      populate: {
-        path: 'connection.teacher',
-        model: 'Teacher'
-      }
-    });
+      .populate({
+        path: 'connection_id',
+        populate: {
+          path: 'connection.teacher',
+          model: 'Teacher'
+        }
+      });
+
     res.status(200).json({ messages: messages, status: true, room: room });
   } catch (error) {
     next(error)
@@ -288,9 +287,25 @@ export const createMessage = async (req: Request, res: Response, next: NextFunct
     // Save the document to the database
     newChatContent.save()
       .then((savedChatContent) => {
-        console.log('New Chat_Content document saved:', savedChatContent);
-        Connection.findByIdAndUpdate(savedChatContent.connection_id, { last_message: savedChatContent._id }).then((result:any)=>{
-          res.status(200).json({ data: savedChatContent, status: true,result,id:req.body.connection });
+        Connection.findByIdAndUpdate(savedChatContent.connection_id, { last_message: savedChatContent._id }).then((result: any) => {
+          if (result) {
+            Chat.findById({ _id: savedChatContent._id }).populate('connection_id').populate({
+              path: 'connection_id',
+              populate: {
+                path: 'connection.student',
+                model: 'Student'
+              }
+            })
+              .populate({
+                path: 'connection_id',
+                populate: {
+                  path: 'connection.teacher',
+                  model: 'Teacher'
+                }
+              }).then((result) => {
+                res.status(200).json({ data: result, status: true, id: req.body.connection });
+              });
+          }
         }).catch((error) => {
           console.error('Error updating last message:', error);
         });

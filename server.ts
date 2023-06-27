@@ -9,15 +9,12 @@ import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import path from "path";
 import dotenv from "dotenv";
-import { Server } from 'socket.io';
 import * as http from 'http';
+import { initializeSocket } from "./socket.io/socketIO";
 
 dotenv.config();
 const app: Application = express()
-const httpServer = http.createServer(app);
-const io: Server = new Server(httpServer, {
-  cors: { origin: 'http://localhost:4200' },
-});;
+
 
 app.use(
   cors({
@@ -52,12 +49,13 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 mongoose
   .connect(process.env.MONGODBSERVER as string)
   .then(() => {
-    httpServer.listen(process.env.PORT as string, () => {
+    const server: http.Server<typeof http.IncomingMessage, typeof http.ServerResponse> = app.listen(process.env.PORT as string, () => {
       console.log("Database connected and Working On " + process.env.PORT);
     });
+    initializeSocket(server);
   })
   .catch((err: Error) => {
-   next(err);
+    next(err);
   });
 
 function next(err: Error) {

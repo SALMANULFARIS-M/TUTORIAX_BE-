@@ -148,7 +148,7 @@ const getAllChats = async (req, res, next) => {
             path: "connection.student",
             model: "Student",
         }).populate('last_message');
-        res.status(200).json({ connections: connections, status: true });
+        res.status(200).json({ connections: connections, status: true, id: id });
     }
     catch (error) {
         next(error);

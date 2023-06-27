@@ -241,7 +241,7 @@ const getAllChats = async (req, res, next) => {
             path: "connection.teacher",
             model: "Teacher",
         }).populate('last_message');
-        res.status(200).json({ connections: connections, status: true });
+        res.status(200).json({ connections: connections, status: true, id: id });
     }
     catch (error) {
         next(error);
@@ -290,9 +290,25 @@ const createMessage = async (req, res, next) => {
         // Save the document to the database
         newChatContent.save()
             .then((savedChatContent) => {
-            console.log('New Chat_Content document saved:', savedChatContent);
             chat_connection_1.default.findByIdAndUpdate(savedChatContent.connection_id, { last_message: savedChatContent._id }).then((result) => {
-                res.status(200).json({ data: savedChatContent, status: true, result, id: req.body.connection });
+                if (result) {
+                    chat_content_1.default.findById({ _id: savedChatContent._id }).populate('connection_id').populate({
+                        path: 'connection_id',
+                        populate: {
+                            path: 'connection.student',
+                            model: 'Student'
+                        }
+                    })
+                        .populate({
+                        path: 'connection_id',
+                        populate: {
+                            path: 'connection.teacher',
+                            model: 'Teacher'
+                        }
+                    }).then((result) => {
+                        res.status(200).json({ data: result, status: true, id: req.body.connection });
+                    });
+                }
             }).catch((error) => {
                 console.error('Error updating last message:', error);
             });
