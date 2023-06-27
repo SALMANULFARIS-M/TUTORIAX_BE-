@@ -251,8 +251,27 @@ exports.getAllChats = getAllChats;
 const getMessages = async (req, res, next) => {
     try {
         const id = req.params.id;
-        const room = await chat_connection_1.default.findById(id);
-        const messages = await chat_content_1.default.find({ connetion_id: id }).populate('from').populate('to').populate('connetion_id');
+        const room = await chat_connection_1.default.findById(id).populate({
+            path: 'connection.student',
+            model: 'Student'
+        }).populate({
+            path: 'connection.teacher',
+            model: 'Teacher'
+        });
+        const messages = await chat_content_1.default.find({ connection_id: id }).populate('connection_id').populate({
+            path: 'connection_id',
+            populate: {
+                path: 'connection.student',
+                model: 'Student'
+            }
+        })
+            .populate({
+            path: 'connection_id',
+            populate: {
+                path: 'connection.teacher',
+                model: 'Teacher'
+            }
+        });
         res.status(200).json({ messages: messages, status: true, room: room });
     }
     catch (error) {
@@ -263,7 +282,7 @@ exports.getMessages = getMessages;
 const createMessage = async (req, res, next) => {
     try {
         const newChatContent = new chat_content_1.default({
-            connetion_id: req.body.connection,
+            connection_id: req.body.connection,
             from: req.body.sender,
             to: req.body.receiver,
             text: req.body.text,
@@ -272,8 +291,8 @@ const createMessage = async (req, res, next) => {
         newChatContent.save()
             .then((savedChatContent) => {
             console.log('New Chat_Content document saved:', savedChatContent);
-            chat_connection_1.default.findByIdAndUpdate(savedChatContent.connetion_id, { last_message: savedChatContent._id }).then((result) => {
-                res.status(200).json({ data: savedChatContent, status: true, result });
+            chat_connection_1.default.findByIdAndUpdate(savedChatContent.connection_id, { last_message: savedChatContent._id }).then((result) => {
+                res.status(200).json({ data: savedChatContent, status: true, result, id: req.body.connection });
             }).catch((error) => {
                 console.error('Error updating last message:', error);
             });
