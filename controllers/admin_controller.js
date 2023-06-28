@@ -79,7 +79,7 @@ const addCourse = async (req, res, next) => {
 exports.addCourse = addCourse;
 const getAllCourse = async (req, res, next) => {
     try {
-        course_model_1.default.find().then((result) => {
+        course_model_1.default.find({ report: { $size: { $gt: 1 } } }).then((result) => {
             const data = result;
             res.status(200).json({ data, status: true });
         }).catch((error) => {
@@ -107,8 +107,16 @@ exports.deleteCourse = deleteCourse;
 const getCourse = async (req, res, next) => {
     try {
         const id = req.params.id;
-        course_model_1.default.findById(id).then((result) => {
-            res.status(200).json({ course: result, status: true });
+        course_model_1.default.findOne({
+            _id: id,
+            $expr: { $lt: [{ $size: "$report" }, 2] }
+        }).then((result) => {
+            if (result) {
+                res.status(200).json({ course: result, status: true });
+            }
+            else {
+                res.status(404).json({ message: 'Course not found', status: false });
+            }
         }).catch((error) => {
             console.log(error, "dfds");
         });
@@ -134,7 +142,7 @@ const editCourse = async (req, res, next) => {
             res.status(200).json({ message: "Successfully changed", status: true });
         })
             .catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {

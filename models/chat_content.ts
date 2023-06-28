@@ -7,6 +7,7 @@ interface connection extends Document {
     to: ObjectId;
     text: string|null;
 }
+
 const connectionSchema = new Schema<connection>({
     connection_id: {
         type: ObjectId,

@@ -15,4 +15,5 @@ router.post('/connection', student_controller_1.chatConnection);
 router.get('/getallmessages/:id', student_controller_1.getMessages);
 router.post('/sendmessage', student_controller_1.createMessage);
 router.post('/applycoupon', student_controller_1.applyCoupon);
+router.post('/reportvideo', student_controller_1.reportVideo);
 exports.default = router;

@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import { Schema, Document, model } from "mongoose";
 
 interface course extends Document {
@@ -8,6 +9,7 @@ interface course extends Document {
     image_id: string;
     video_id: string;
     description: string;
+    report:any[];
 }
 
 const courseSchema = new Schema<course>({
@@ -38,7 +40,17 @@ const courseSchema = new Schema<course>({
     description: {
         type: String,
         required:true
-    }
+    },
+    report:[{
+        text: {
+          type: String,
+          required: true,
+        },
+        student: {
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
+      }]
 });
 
 export default model<course>("Course", courseSchema);

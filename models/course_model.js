@@ -29,6 +29,16 @@ const courseSchema = new mongoose_1.Schema({
     description: {
         type: String,
         required: true
-    }
+    },
+    report: [{
+            text: {
+                type: String,
+                required: true,
+            },
+            student: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                required: true,
+            },
+        }]
 });
 exports.default = (0, mongoose_1.model)("Course", courseSchema);

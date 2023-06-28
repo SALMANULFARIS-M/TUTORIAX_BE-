@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
     checkStudent, insertStudent, verifyLogin, savePassword,
     saveOrder, checkPurchased,getAllTutors,chatConnection,getAllChats,
-    getMessages,createMessage,applyCoupon
+    getMessages,createMessage,applyCoupon,reportVideo
 } from "../controllers/student_controller";
 
 const router = Router();
@@ -19,4 +19,5 @@ router.post('/connection',chatConnection);
 router.get('/getallmessages/:id',getMessages);
 router.post('/sendmessage',createMessage)
 router.post('/applycoupon',applyCoupon);
+router.post('/reportvideo',reportVideo);
 export default router;

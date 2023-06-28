@@ -75,7 +75,7 @@ export const addCourse = async (req: Request, res: Response, next: NextFunction)
 
 export const getAllCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    Course.find().then((result) => {
+    Course.find({ report: { $size: { $gt: 1 } } }).then((result) => {
       const data = result
       res.status(200).json({ data, status: true });
     }).catch((error) => {
@@ -104,8 +104,15 @@ export const deleteCourse = async (req: Request, res: Response, next: NextFuncti
 export const getCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id: string = req.params.id
-    Course.findById(id).then((result) => {
-      res.status(200).json({ course: result, status: true });
+    Course.findOne({
+      _id: id,
+      $expr: { $lt: [{ $size: "$report" }, 2] }
+    }).then((result) => {
+      if (result) {
+        res.status(200).json({ course: result, status: true });
+      } else {
+        res.status(404).json({ message: 'Course not found', status: false });
+      }
     }).catch((error) => {
       console.log(error, "dfds");
     })
@@ -131,9 +138,8 @@ export const editCourse = async (req: Request, res: Response, next: NextFunction
         res.status(200).json({ message: "Successfully changed", status: true });
       })
       .catch((error) => {
-        console.log(error);
+        next(error);
       });
-
   } catch (error) {
     next(error)
   }

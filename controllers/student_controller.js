@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const chat_content_1 = __importDefault(require("../models/chat_content"));
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
+const course_model_1 = __importDefault(require("../models/course_model"));
 const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -423,3 +424,31 @@ const applyCoupon = async (req, res, next) => {
     }
 };
 exports.applyCoupon = applyCoupon;
+const reportVideo = async (req, res, next) => {
+    try {
+        const token = req.body.token;
+        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+        const studentId = decodedToken.student_id;
+        const data = await course_model_1.default.findOne({
+            _id: req.body.courseId,
+            'report.student': studentId,
+        });
+        if (data) {
+            res.status(200).json({ message: "Already made an report on this video", status: false });
+        }
+        else {
+            const report = { text: req.body.text, student: studentId };
+            course_model_1.default.findByIdAndUpdate({ _id: req.body.courseId }, { $push: { report: report } }).then((data) => {
+                res.status(200).json({ status: true });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
+exports.reportVideo = reportVideo;

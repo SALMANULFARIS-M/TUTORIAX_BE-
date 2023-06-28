@@ -2,6 +2,7 @@ import Student from "../models/student_model";
 import Connection from "../models/chat_connection";
 import Chat from "../models/chat_content";
 import Teacher from "../models/teacher_model";
+import Course from "../models/course_model";
 import Order from "../models/order_model";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -426,3 +427,32 @@ export const applyCoupon = async (req: Request, res: Response, next: NextFunctio
     next(error)
   }
 };
+
+export const reportVideo = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const token: any = req.body.token
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const studentId = decodedToken.student_id;
+    const data = await Course.findOne({
+      _id: req.body.courseId,
+      'report.student': studentId,
+    })
+    if (data) {
+      res.status(200).json({ message: "Already made an report on this video", status: false });
+    } else {
+      const report = { text: req.body.text, student: studentId }
+      Course.findByIdAndUpdate({ _id: req.body.courseId },
+        { $push: { report: report } }).then((data: any) => {
+          res.status(200).json({ status: true });
+        })
+        .catch((error) => {
+          console.error("Error searching for student:", error);
+        });
+    }
+
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
