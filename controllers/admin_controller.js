@@ -79,7 +79,12 @@ const addCourse = async (req, res, next) => {
 exports.addCourse = addCourse;
 const getAllCourse = async (req, res, next) => {
     try {
-        course_model_1.default.find({ report: { $size: { $gt: 1 } } }).then((result) => {
+        course_model_1.default.find({
+            $or: [
+                { report: { $exists: false } },
+                { $expr: { $lt: [{ $size: "$report" }, 2] } },
+            ],
+        }).then((result) => {
             const data = result;
             res.status(200).json({ data, status: true });
         }).catch((error) => {
@@ -108,8 +113,15 @@ const getCourse = async (req, res, next) => {
     try {
         const id = req.params.id;
         course_model_1.default.findOne({
-            _id: id,
-            $expr: { $lt: [{ $size: "$report" }, 2] }
+            $and: [
+                { _id: id },
+                {
+                    $or: [
+                        { report: { $exists: false } },
+                        { $expr: { $lt: [{ $size: "$report" }, 2] } }
+                    ]
+                }
+            ]
         }).then((result) => {
             if (result) {
                 res.status(200).json({ course: result, status: true });
