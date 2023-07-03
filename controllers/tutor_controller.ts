@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from "express";
 //Password bcryption
 const securePassword = async (password: string): Promise<string> => {
   try {
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash:string = await bcrypt.hash(password, 10);
     return passwordHash;
   } catch (error) {
     throw new Error("Something went wrong");
@@ -18,7 +18,7 @@ const securePassword = async (password: string): Promise<string> => {
 //check the teacher already exist
 export const checkTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile = parseInt(req.body.mobile)
+    const mobile:number = parseInt(req.body.mobile)
     const data = await Teacher.findOne({ mobile: mobile });
     if (data) {
       if (data.access) {
@@ -46,7 +46,7 @@ export const checkTeacher = async (req: Request, res: Response, next: NextFuncti
 //Insert a new Teacher  --signup page
 export const insertTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile = parseInt(req.body.mobile)
+    const mobile:number = parseInt(req.body.mobile)
     const data = await Teacher.findOne({ mobile: mobile });
     if (data) {
       res
@@ -64,7 +64,7 @@ export const insertTeacher = async (req: Request, res: Response, next: NextFunct
       await teacher.save();
 
       //jwt token create
-      const token = await jwt.sign(
+      const token:string = await jwt.sign(
         { teacher_id: teacher._id, type: "tutor" },
         process.env.SECRET_KEY!,
         {

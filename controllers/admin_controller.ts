@@ -6,6 +6,7 @@ import Coupon from "../models/coupon_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import { Date } from "mongoose";
 
 
 export const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
@@ -45,7 +46,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
 
 export const addCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const title = req.body.title
+    const title:string = req.body.title
     const data = await Course.findOne({ title: title });
     if (data) {
       res

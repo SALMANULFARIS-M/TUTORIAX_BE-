@@ -23,7 +23,7 @@ const securePassword = async (password: string): Promise<string> => {
 //check the Student already exist
 export const checkStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile = parseInt(req.body.mobile)
+    const mobile:number = parseInt(req.body.mobile)
     const data = await Student.findOne({ mobile: mobile });
     if (data) {
       if (data.access) {
@@ -45,14 +45,14 @@ export const checkStudent = async (req: Request, res: Response, next: NextFuncti
 //Insert a new Student  --signup page
 export const insertStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile = parseInt(req.body.mobile)
+    const mobile:number = parseInt(req.body.mobile)
     const data = await Student.findOne({ mobile: mobile });
     if (data) {
       res
         .status(400)
         .send({ message: "E-mail Already Registered", status: false });
     } else {
-      const psw = await securePassword(req.body.password);
+      const psw:string = await securePassword(req.body.password);
       const student = new Student({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -63,7 +63,7 @@ export const insertStudent = async (req: Request, res: Response, next: NextFunct
       await student.save();
 
       //jwt token create
-      const token = jwt.sign(
+      const token:string = jwt.sign(
         { student_id: student._id, type: "student" },
         process.env.SECRET_KEY!,
         {

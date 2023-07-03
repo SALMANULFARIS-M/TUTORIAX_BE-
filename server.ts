@@ -2,7 +2,7 @@ declare module 'express';
 import express, { Application, Request, Response, NextFunction } from "express";
 import studentRoutes from "./routes/student_routes";
 import adminRoutes from "./routes/admin_routes";
-import teacherRoutes from "./routes/teacher_routes";
+import teacherRoutes from "./routes/student_routes";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
