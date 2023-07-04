@@ -6,7 +6,6 @@ import Coupon from "../models/coupon_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
-import { Date } from "mongoose";
 
 
 export const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
@@ -281,9 +280,9 @@ export const addCoupon = async (req: Request, res: Response, next: NextFunction)
       code: { $regex: name, $options: "i" },
     });
     if (!existData) {
-      const percentage = req.body.discountPercentage;
-      const max_dis = req.body.maxDiscount;
-      const Amount = req.body.minAmount;
+      const percentage:number = parseInt(req.body.discountPercentage);
+      const max_dis:number = parseInt(req.body.maxDiscount);
+      const Amount:number = parseInt(req.body.minAmount);
       const date = new Date(req.body.expDate);
       const coupon = new Coupon({
         code: name,
