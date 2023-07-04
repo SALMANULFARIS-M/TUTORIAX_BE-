@@ -293,9 +293,9 @@ const addCoupon = async (req, res, next) => {
             code: { $regex: name, $options: "i" },
         });
         if (!existData) {
-            const percentage = req.body.discountPercentage;
-            const max_dis = req.body.maxDiscount;
-            const Amount = req.body.minAmount;
+            const percentage = parseInt(req.body.discountPercentage);
+            const max_dis = parseInt(req.body.maxDiscount);
+            const Amount = parseInt(req.body.minAmount);
             const date = new Date(req.body.expDate);
             const coupon = new coupon_model_1.default({
                 code: name,
