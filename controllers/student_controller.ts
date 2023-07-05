@@ -23,7 +23,7 @@ const securePassword = async (password: string): Promise<string> => {
 //check the Student already exist
 export const checkStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile:number = parseInt(req.body.mobile)
+    const mobile: number = parseInt(req.body.mobile)
     const data = await Student.findOne({ mobile: mobile });
     if (data) {
       if (data.access) {
@@ -45,14 +45,14 @@ export const checkStudent = async (req: Request, res: Response, next: NextFuncti
 //Insert a new Student  --signup page
 export const insertStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const mobile:number = parseInt(req.body.mobile)
+    const mobile: number = parseInt(req.body.mobile)
     const data = await Student.findOne({ mobile: mobile });
     if (data) {
       res
         .status(400)
         .send({ message: "E-mail Already Registered", status: false });
     } else {
-      const psw:string = await securePassword(req.body.password);
+      const psw: string = await securePassword(req.body.password);
       const student = new Student({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -63,7 +63,7 @@ export const insertStudent = async (req: Request, res: Response, next: NextFunct
       await student.save();
 
       //jwt token create
-      const token:string = jwt.sign(
+      const token: string = jwt.sign(
         { student_id: student._id, type: "student" },
         process.env.SECRET_KEY!,
         {
@@ -252,7 +252,16 @@ export const getAllChats = async (req: Request, res: Response, next: NextFunctio
 
 export const getMessages = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const id = req.params.id
+    const id: string = req.body.connection
+    const to: string = req.body.to;
+    if (to !== undefined) {
+      await Chat.updateMany({
+        connection_id: id,
+        from: to
+      }, {
+        $set: { view: true }
+      })
+    }
     const room = await Connection.findById(id).populate({
       path: 'connection.student',
       model: 'Student'
@@ -451,6 +460,44 @@ export const reportVideo = async (req: Request, res: Response, next: NextFunctio
         });
     }
 
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
+
+export const chatSeen = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const connection = req.body.connection;
+    const to = req.body.to;
+    Chat.find({
+      connection_id: connection,
+      from: to,
+      view: false
+    }).countDocuments().then((count) => {
+      res.status(200).json({ status: true, count: count });
+    })
+      .catch((error) => {
+        console.error("Error searching for student:", error);
+      });
+
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
+export const chatView = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = req.params.id;
+
+    Chat.findByIdAndUpdate(id,{
+      view: true
+    }).then((count) => {
+      res.status(200).json({ status: true, count: count });
+    })
+      .catch((error) => {
+        console.error("Error searching for student:", error);
+      });
   } catch (error) {
     console.log(error);
     next(error)

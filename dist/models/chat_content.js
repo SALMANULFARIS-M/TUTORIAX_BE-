@@ -20,6 +20,11 @@ const connectionSchema = new mongoose_1.Schema({
         type: String,
         default: "",
         required: true,
+    },
+    view: {
+        type: Boolean,
+        default: false,
+        required: true
     }
 }, {
     timestamps: true, // Add timestamps fields

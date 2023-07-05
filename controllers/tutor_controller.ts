@@ -93,6 +93,7 @@ export const insertTeacher = async (req: Request, res: Response, next: NextFunct
 
 export const verifyLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    
     const mobile: string = req.body.mobile;
     const password: string = req.body.password;
     const teacherData = await Teacher.findOne({ mobile: mobile });

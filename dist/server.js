@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const student_routes_1 = __importDefault(require("./routes/student_routes"));
 const admin_routes_1 = __importDefault(require("./routes/admin_routes"));
-const student_routes_2 = __importDefault(require("./routes/student_routes"));
+const teacher_routes_1 = __importDefault(require("./routes/teacher_routes"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
@@ -27,7 +27,7 @@ app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.json());
 app.use("/", student_routes_1.default);
 app.use("/admin", admin_routes_1.default);
-app.use("/tutor", student_routes_2.default);
+app.use("/tutor", teacher_routes_1.default);
 // Handle 404 errors
 app.use((req, res, next) => {
     res.status(404).json({ error: 'Not found' });

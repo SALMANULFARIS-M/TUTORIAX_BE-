@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const chat_content_1 = __importDefault(require("../models/chat_content"));
@@ -255,7 +255,16 @@ const getAllChats = async (req, res, next) => {
 exports.getAllChats = getAllChats;
 const getMessages = async (req, res, next) => {
     try {
-        const id = req.params.id;
+        const id = req.body.connection;
+        const to = req.body.to;
+        if (to !== undefined) {
+            await chat_content_1.default.updateMany({
+                connection_id: id,
+                from: to
+            }, {
+                $set: { view: true }
+            });
+        }
         const room = await chat_connection_1.default.findById(id).populate({
             path: 'connection.student',
             model: 'Student'
@@ -452,3 +461,42 @@ const reportVideo = async (req, res, next) => {
     }
 };
 exports.reportVideo = reportVideo;
+const chatSeen = async (req, res, next) => {
+    try {
+        const connection = req.body.connection;
+        const to = req.body.to;
+        chat_content_1.default.find({
+            connection_id: connection,
+            from: to,
+            view: false
+        }).countDocuments().then((count) => {
+            res.status(200).json({ status: true, count: count });
+        })
+            .catch((error) => {
+            console.error("Error searching for student:", error);
+        });
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
+exports.chatSeen = chatSeen;
+const chatView = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+        chat_content_1.default.findByIdAndUpdate(id, {
+            view: true
+        }).then((count) => {
+            res.status(200).json({ status: true, count: count });
+        })
+            .catch((error) => {
+            console.error("Error searching for student:", error);
+        });
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
+exports.chatView = chatView;

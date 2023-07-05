@@ -6,6 +6,7 @@ interface connection extends Document {
     from: ObjectId;
     to: ObjectId;
     text: string|null;
+    view:boolean;
 }
 
 const connectionSchema = new Schema<connection>({
@@ -26,6 +27,11 @@ const connectionSchema = new Schema<connection>({
         type: String,
         default:"",
         required: true,
+    },
+    view:{
+        type:Boolean,
+        default:false,
+        required:true
     }
 },
     {
