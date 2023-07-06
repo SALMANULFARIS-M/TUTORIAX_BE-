@@ -7,4 +7,7 @@ router.post('/checktutor', tutor_controller_1.checkTeacher);
 router.post('/register', tutor_controller_1.insertTeacher);
 router.post('/login', tutor_controller_1.verifyLogin);
 router.get('/getallchats/:id', tutor_controller_1.getAllChats);
+router.get('/getteacher', tutor_controller_1.getTeacher);
+router.patch('/editteacher', tutor_controller_1.updateTeacher);
+router.patch('/editimage', tutor_controller_1.updateImage);
 exports.default = router;

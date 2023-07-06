@@ -531,7 +531,7 @@ export const updateStudent = async (req: Request, res: Response, next: NextFunct
     if (token) {
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
       const id = decodedToken.student_id;
-      Student.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, mobile: req.body.mobile }).then((data) => {
+      Student.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email }).then((data) => {
         res.status(200).json({ status: true });
       })
         .catch((error) => {

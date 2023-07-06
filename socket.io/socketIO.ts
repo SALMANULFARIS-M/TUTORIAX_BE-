@@ -23,7 +23,6 @@ export const initializeSocket = async (server: any) => {
       socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
       socket.on("new message", (newMessageRecieved) => {
-        console.log(newMessageRecieved);
           socket.in(newMessageRecieved.to).emit("message recieved", newMessageRecieved);
       });
 

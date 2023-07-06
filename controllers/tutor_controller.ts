@@ -1,7 +1,6 @@
 import Teacher from "../models/teacher_model";
 import bcrypt from "bcrypt";
 import Connection from "../models/chat_connection";
-import Chat from "../models/chat_content";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
@@ -137,7 +136,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
 export const getAllChats = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const token: any = req.params.id;
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & {  teacher_id: string };
     const id = decodedToken.teacher_id;
     const connections = await Connection.find({ "connection.teacher": id }).sort({ updatedAt: -1 }).populate({
       path: "connection.student",
@@ -148,3 +147,62 @@ export const getAllChats = async (req: Request, res: Response, next: NextFunctio
     next(error)
   }
 };
+
+
+export const getTeacher = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token) {
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & {  teacher_id: string };
+      const id = decodedToken.teacher_id;
+      Teacher.findById(id).then((data) => {
+        res.status(200).json({ status: true, data });
+      })
+        .catch((error) => {
+          console.error("Error searching for student:", error);
+        });
+    }
+  } catch (error) {
+    console.log(error);
+    next(error)
+  }
+}
+
+export const updateTeacher = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token) {
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & {  teacher_id: string };
+      const id = decodedToken.teacher_id;
+      Teacher.findByIdAndUpdate(id, { fullName: req.body.fullName, email: req.body.email }).then((data) => {
+        res.status(200).json({ status: true });
+      })
+        .catch((error) => {
+          console.error("Error searching for student:", error);
+        });
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const updateImage = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token) {
+      const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & {  teacher_id: string };
+      const id = decodedToken.teacher_id;
+      Teacher.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
+        res.status(200).json({ status: true,image:data?.image });
+      })
+        .catch((error) => {
+          console.error("Error searching for student:", error);
+        });
+    }
+  } catch (error) {
+    next(error)
+  }
+}

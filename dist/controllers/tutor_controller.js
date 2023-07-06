@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllChats = exports.verifyLogin = exports.insertTeacher = exports.checkTeacher = void 0;
+exports.updateImage = exports.updateTeacher = exports.getTeacher = exports.getAllChats = exports.verifyLogin = exports.insertTeacher = exports.checkTeacher = void 0;
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
@@ -155,3 +155,64 @@ const getAllChats = async (req, res, next) => {
     }
 };
 exports.getAllChats = getAllChats;
+const getTeacher = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            const id = decodedToken.teacher_id;
+            teacher_model_1.default.findById(id).then((data) => {
+                res.status(200).json({ status: true, data });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
+exports.getTeacher = getTeacher;
+const updateTeacher = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            const id = decodedToken.teacher_id;
+            teacher_model_1.default.findByIdAndUpdate(id, { fullName: req.body.fullName, email: req.body.email }).then((data) => {
+                res.status(200).json({ status: true });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.updateTeacher = updateTeacher;
+const updateImage = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            const id = decodedToken.teacher_id;
+            teacher_model_1.default.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
+                res.status(200).json({ status: true, image: data?.image });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.updateImage = updateImage;

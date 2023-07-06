@@ -528,7 +528,7 @@ const updateStudent = async (req, res, next) => {
         if (token) {
             const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
             const id = decodedToken.student_id;
-            student_model_1.default.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, mobile: req.body.mobile }).then((data) => {
+            student_model_1.default.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email }).then((data) => {
                 res.status(200).json({ status: true });
             })
                 .catch((error) => {
