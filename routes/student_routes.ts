@@ -2,7 +2,8 @@ import { Router } from "express";
 import {
     checkStudent, insertStudent, verifyLogin, savePassword,
     saveOrder, checkPurchased,getAllTutors,chatConnection,getAllChats,
-    getMessages,createMessage,applyCoupon,reportVideo,chatSeen,chatView
+    getMessages,createMessage,applyCoupon,reportVideo,chatSeen,chatView,
+    getStudent,updateStudent,updateImage
 } from "../controllers/student_controller";
 
 const router = Router();
@@ -22,5 +23,9 @@ router.post('/applycoupon',applyCoupon);
 router.post('/reportvideo',reportVideo);
 router.post('/chatseen',chatSeen);
 router.patch('/chatview/:id',chatView);
+router.get('/getstudent',getStudent);
+router.patch('/editstudent',updateStudent);
+router.patch('/editimage',updateImage);
+
 
 export default router;

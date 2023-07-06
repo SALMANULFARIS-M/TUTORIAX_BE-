@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.updateImage = exports.updateStudent = exports.getStudent = exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const chat_content_1 = __importDefault(require("../models/chat_content"));
@@ -500,3 +500,64 @@ const chatView = async (req, res, next) => {
     }
 };
 exports.chatView = chatView;
+const getStudent = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            const id = decodedToken.student_id;
+            student_model_1.default.findById(id).then((data) => {
+                res.status(200).json({ status: true, data });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
+exports.getStudent = getStudent;
+const updateStudent = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            const id = decodedToken.student_id;
+            student_model_1.default.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, mobile: req.body.mobile }).then((data) => {
+                res.status(200).json({ status: true });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.updateStudent = updateStudent;
+const updateImage = async (req, res, next) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
+        if (token) {
+            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
+            const id = decodedToken.student_id;
+            student_model_1.default.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
+                res.status(200).json({ status: true, image: data?.image });
+            })
+                .catch((error) => {
+                console.error("Error searching for student:", error);
+            });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.updateImage = updateImage;

@@ -18,4 +18,7 @@ router.post('/applycoupon', student_controller_1.applyCoupon);
 router.post('/reportvideo', student_controller_1.reportVideo);
 router.post('/chatseen', student_controller_1.chatSeen);
 router.patch('/chatview/:id', student_controller_1.chatView);
+router.get('/getstudent', student_controller_1.getStudent);
+router.patch('/editstudent', student_controller_1.updateStudent);
+router.patch('/editimage', student_controller_1.updateImage);
 exports.default = router;
