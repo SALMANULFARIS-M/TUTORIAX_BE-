@@ -7,22 +7,18 @@ import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
-import path from "path";
 import dotenv from "dotenv";
 import * as http from 'http';
 import { initializeSocket } from "./socket.io/socketIO";
 
 dotenv.config();
 const app: Application = express()
-
-
 app.use(
   cors({
     credentials: true,
     origin: [process.env.ORIGIN as string],
   })
 );
-app.use(express.static(path.join(__dirname, "public/images/")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());

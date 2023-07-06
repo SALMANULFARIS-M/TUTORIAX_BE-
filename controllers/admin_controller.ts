@@ -3,6 +3,7 @@ import Student from "../models/student_model";
 import Teacher from "../models/teacher_model";
 import Course from "../models/course_model";
 import Coupon from "../models/coupon_model";
+import Order from "../models/order_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
@@ -45,7 +46,7 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
 
 export const addCourse = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const title:string = req.body.title
+    const title: string = req.body.title
     const data = await Course.findOne({ title: title });
     if (data) {
       res
@@ -280,9 +281,9 @@ export const addCoupon = async (req: Request, res: Response, next: NextFunction)
       code: { $regex: name, $options: "i" },
     });
     if (!existData) {
-      const percentage:number = parseInt(req.body.discountPercentage);
-      const max_dis:number = parseInt(req.body.maxDiscount);
-      const Amount:number = parseInt(req.body.minAmount);
+      const percentage: number = parseInt(req.body.discountPercentage);
+      const max_dis: number = parseInt(req.body.maxDiscount);
+      const Amount: number = parseInt(req.body.minAmount);
       const date = new Date(req.body.expDate);
       const coupon = new Coupon({
         code: name,
@@ -310,7 +311,38 @@ export const deleteCoupon = async (req: Request, res: Response, next: NextFuncti
       res.status(200).json({ status: true });
     }).catch((error) => {
       next(error);
-    });;;
+    });
+
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const dasboardCounts = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+
+    const student = await Student.find().countDocuments()
+    const teacher = await Teacher.find().countDocuments()
+    const course = await Course.find().countDocuments()
+    const counts = {
+      std: student,
+      tchr: teacher,
+      crs: course
+    }
+    res.status(200).json({ status: true, counts });
+
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const orderData = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    Order.find().sort({ createdAt: -1 }).populate('course_id').populate('student_id').then((result: any) => {
+      res.status(200).json({ status: true,result });
+    }).catch((error) => {
+      next(error);
+    });
 
   } catch (error) {
     next(error)

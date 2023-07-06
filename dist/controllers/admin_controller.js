@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCoupon = exports.addCoupon = exports.getCoupons = exports.approveTutor = exports.blockTutor = exports.getTutor = exports.getAllTutors = exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
+exports.orderData = exports.dasboardCounts = exports.deleteCoupon = exports.addCoupon = exports.getCoupons = exports.approveTutor = exports.blockTutor = exports.getTutor = exports.getAllTutors = exports.blockStudent = exports.getAllStudents = exports.editCourse = exports.getCourse = exports.deleteCourse = exports.getAllCourse = exports.addCourse = exports.verifyLogin = void 0;
 const admin_model_1 = __importDefault(require("../models/admin_model"));
 const student_model_1 = __importDefault(require("../models/student_model"));
 const teacher_model_1 = __importDefault(require("../models/teacher_model"));
 const course_model_1 = __importDefault(require("../models/course_model"));
 const coupon_model_1 = __importDefault(require("../models/coupon_model"));
+const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const verifyLogin = async (req, res, next) => {
@@ -327,11 +328,39 @@ const deleteCoupon = async (req, res, next) => {
         }).catch((error) => {
             next(error);
         });
-        ;
-        ;
     }
     catch (error) {
         next(error);
     }
 };
 exports.deleteCoupon = deleteCoupon;
+const dasboardCounts = async (req, res, next) => {
+    try {
+        const student = await student_model_1.default.find().countDocuments();
+        const teacher = await teacher_model_1.default.find().countDocuments();
+        const course = await course_model_1.default.find().countDocuments();
+        const counts = {
+            std: student,
+            tchr: teacher,
+            crs: course
+        };
+        res.status(200).json({ status: true, counts });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.dasboardCounts = dasboardCounts;
+const orderData = async (req, res, next) => {
+    try {
+        order_model_1.default.find().sort({ createdAt: -1 }).populate('course_id').populate('student_id').then((result) => {
+            res.status(200).json({ status: true, result });
+        }).catch((error) => {
+            next(error);
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.orderData = orderData;

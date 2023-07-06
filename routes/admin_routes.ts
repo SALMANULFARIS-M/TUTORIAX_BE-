@@ -3,7 +3,7 @@ import {
     verifyLogin, addCourse, getAllCourse, deleteCourse,
     getCourse,editCourse,getAllStudents,blockStudent,
     getAllTutors,approveTutor,blockTutor,getTutor,
-    getCoupons,addCoupon,deleteCoupon
+    getCoupons,addCoupon,deleteCoupon,dasboardCounts,orderData
 } from "../controllers/admin_controller";
 
 const router = Router();
@@ -22,5 +22,7 @@ router.patch('/approvetutor/:id',approveTutor)
 router.get('/getcoupons', getCoupons);
 router.post('/addcoupon',addCoupon)
 router.delete('/deletecoupon/:id',deleteCoupon)
+router.get('/getcounts', dasboardCounts);
+router.get('/getorders',orderData)
 
 export default router;  

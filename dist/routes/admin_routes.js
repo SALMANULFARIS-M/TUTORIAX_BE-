@@ -18,4 +18,6 @@ router.patch('/approvetutor/:id', admin_controller_1.approveTutor);
 router.get('/getcoupons', admin_controller_1.getCoupons);
 router.post('/addcoupon', admin_controller_1.addCoupon);
 router.delete('/deletecoupon/:id', admin_controller_1.deleteCoupon);
+router.get('/getcounts', admin_controller_1.dasboardCounts);
+router.get('/getorders', admin_controller_1.orderData);
 exports.default = router;
