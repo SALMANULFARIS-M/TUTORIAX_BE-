@@ -166,12 +166,11 @@ const getTeacher = async (req, res, next) => {
                 res.status(200).json({ status: true, data });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 };
@@ -187,7 +186,7 @@ const updateTeacher = async (req, res, next) => {
                 res.status(200).json({ status: true });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }
@@ -207,7 +206,7 @@ const updateImage = async (req, res, next) => {
                 res.status(200).json({ status: true, image: data?.image });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }

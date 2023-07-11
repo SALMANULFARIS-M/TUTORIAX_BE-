@@ -167,7 +167,7 @@ const saveOrder = async (req, res, next) => {
                 }
             })
                 .catch((error) => {
-                console.error("Error updating purchased course:", error);
+                next(error);
             });
         });
     }
@@ -191,7 +191,7 @@ const checkPurchased = async (req, res, next) => {
             }
         })
             .catch((error) => {
-            console.error("Error searching for student:", error);
+            next(error);
         });
     }
     catch (error) {
@@ -205,7 +205,7 @@ const getAllTutors = async (req, res, next) => {
             const data = result;
             res.status(200).json({ data, status: true });
         }).catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {
@@ -222,9 +222,12 @@ const chatConnection = async (req, res, next) => {
         const existingConnection = await chat_connection_1.default.findOne({
             "connection.student": connection.student,
             "connection.teacher": connection.teacher
+        }).populate({
+            path: "connection.teacher",
+            model: "Teacher",
         });
         if (existingConnection) {
-            res.status(200).json({ existingConnection, status: true });
+            res.status(200).json({ newConnection: existingConnection, status: true });
         }
         else {
             const newConnection = new chat_connection_1.default({ connection });
@@ -324,11 +327,11 @@ const createMessage = async (req, res, next) => {
                     });
                 }
             }).catch((error) => {
-                console.error('Error updating last message:', error);
+                next(error);
             });
         })
             .catch((error) => {
-            console.error('Error saving Chat_Content document:', error);
+            next(error);
         });
     }
     catch (error) {
@@ -451,12 +454,11 @@ const reportVideo = async (req, res, next) => {
                 res.status(200).json({ status: true });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 };
@@ -473,11 +475,10 @@ const chatSeen = async (req, res, next) => {
             res.status(200).json({ status: true, count: count });
         })
             .catch((error) => {
-            console.error("Error searching for student:", error);
+            next(error);
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 };
@@ -491,11 +492,10 @@ const chatView = async (req, res, next) => {
             res.status(200).json({ status: true, count: count });
         })
             .catch((error) => {
-            console.error("Error searching for student:", error);
+            next(error);
         });
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 };
@@ -511,12 +511,11 @@ const getStudent = async (req, res, next) => {
                 res.status(200).json({ status: true, data });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }
     catch (error) {
-        console.log(error);
         next(error);
     }
 };
@@ -532,7 +531,7 @@ const updateStudent = async (req, res, next) => {
                 res.status(200).json({ status: true });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }
@@ -552,7 +551,7 @@ const updateImage = async (req, res, next) => {
                 res.status(200).json({ status: true, image: data?.image });
             })
                 .catch((error) => {
-                console.error("Error searching for student:", error);
+                next(error);
             });
         }
     }

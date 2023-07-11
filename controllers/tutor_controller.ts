@@ -160,11 +160,10 @@ export const getTeacher = async (req: Request, res: Response, next: NextFunction
         res.status(200).json({ status: true, data });
       })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+          next( error);
         });
     }
   } catch (error) {
-    console.log(error);
     next(error)
   }
 }
@@ -180,7 +179,7 @@ export const updateTeacher = async (req: Request, res: Response, next: NextFunct
         res.status(200).json({ status: true });
       })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+        next(error);
         });
     }
   } catch (error) {
@@ -199,7 +198,7 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
         res.status(200).json({ status: true,image:data?.image });
       })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+          next(error);
         });
     }
   } catch (error) {

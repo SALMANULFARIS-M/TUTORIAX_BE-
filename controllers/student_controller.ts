@@ -165,7 +165,7 @@ export const saveOrder = async (req: Request, res: Response, next: NextFunction)
         }
       })
         .catch((error) => {
-          console.error("Error updating purchased course:", error);
+          next( error);
         });
     });
 
@@ -189,9 +189,8 @@ export const checkPurchased = async (req: Request, res: Response, next: NextFunc
         }
       })
       .catch((error) => {
-        console.error("Error searching for student:", error);
+        next(error);
       });
-
   } catch (error) {
     next(error)
   }
@@ -203,7 +202,7 @@ export const getAllTutors = async (req: Request, res: Response, next: NextFuncti
       const data = result
       res.status(200).json({ data, status: true });
     }).catch((error) => {
-      console.log(error);
+      next(error);
     })
   } catch (error) {
     next(error)
@@ -218,13 +217,15 @@ export const chatConnection = async (req: Request, res: Response, next: NextFunc
     const studentId = decodedToken.student_id;
     const connection: { student: ObjectId; teacher: ObjectId } =
       { student: new ObjectId(studentId), teacher: new ObjectId(req.body.tutor) };
-
     const existingConnection = await Connection.findOne({
       "connection.student": connection.student,
       "connection.teacher": connection.teacher
+    }).populate({
+      path: "connection.teacher",
+      model: "Teacher",
     });
     if (existingConnection) {
-      res.status(200).json({ existingConnection, status: true });
+      res.status(200).json({ newConnection:existingConnection, status: true });
     } else {
       const newConnection = new Connection({ connection });
       await newConnection.save();
@@ -322,11 +323,11 @@ export const createMessage = async (req: Request, res: Response, next: NextFunct
               });
           }
         }).catch((error) => {
-          console.error('Error updating last message:', error);
+         next(error)
         });
       })
       .catch((error) => {
-        console.error('Error saving Chat_Content document:', error);
+       next(error)
       });
   } catch (error) {
     next(error)
@@ -428,11 +429,7 @@ export const applyCoupon = async (req: Request, res: Response, next: NextFunctio
             discount: 0,
           });
         })
-
-
-
   } catch (error) {
-
     next(error)
   }
 };
@@ -456,12 +453,11 @@ export const reportVideo = async (req: Request, res: Response, next: NextFunctio
           res.status(200).json({ status: true });
         })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+          next( error);
         });
     }
 
   } catch (error) {
-    console.log(error);
     next(error)
   }
 }
@@ -478,28 +474,25 @@ export const chatSeen = async (req: Request, res: Response, next: NextFunction) 
       res.status(200).json({ status: true, count: count });
     })
       .catch((error) => {
-        console.error("Error searching for student:", error);
+        next( error);
       });
 
   } catch (error) {
-    console.log(error);
     next(error)
   }
 }
 export const chatView = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = req.params.id;
-
     Chat.findByIdAndUpdate(id, {
       view: true
     }).then((count) => {
       res.status(200).json({ status: true, count: count });
     })
       .catch((error) => {
-        console.error("Error searching for student:", error);
+        next(error);
       });
   } catch (error) {
-    console.log(error);
     next(error)
   }
 }
@@ -515,11 +508,10 @@ export const getStudent = async (req: Request, res: Response, next: NextFunction
         res.status(200).json({ status: true, data });
       })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+          next(error)
         });
     }
   } catch (error) {
-    console.log(error);
     next(error)
   }
 }
@@ -535,7 +527,7 @@ export const updateStudent = async (req: Request, res: Response, next: NextFunct
         res.status(200).json({ status: true });
       })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+          next( error);
         });
     }
   } catch (error) {
@@ -554,7 +546,7 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
         res.status(200).json({ status: true,image:data?.image });
       })
         .catch((error) => {
-          console.error("Error searching for student:", error);
+          next( error);
         });
     }
   } catch (error) {

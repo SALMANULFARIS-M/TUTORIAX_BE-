@@ -89,7 +89,7 @@ const getAllCourse = async (req, res, next) => {
             const data = result;
             res.status(200).json({ data, status: true });
         }).catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {
@@ -102,7 +102,7 @@ const deleteCourse = async (req, res, next) => {
         course_model_1.default.findByIdAndDelete({ _id: req.params.id }).then((result) => {
             res.status(200).json({ thumbnailURL: result?.image_id, videoURL: result?.video_id, message: "Successfully deleted", status: true });
         }).catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {
@@ -169,7 +169,7 @@ const getAllStudents = async (req, res, next) => {
             const data = result;
             res.status(200).json({ data, status: true });
         }).catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {
@@ -186,7 +186,7 @@ const blockStudent = async (req, res, next) => {
             }).then((result) => {
                 res.status(200).json({ Message: "Blocked the student", status: true });
             }).catch((error) => {
-                console.log(error);
+                next(error);
             });
         }
         else {
@@ -195,7 +195,7 @@ const blockStudent = async (req, res, next) => {
             }).then((result) => {
                 res.status(200).json({ Message: "Unblocked the student", status: true });
             }).catch((error) => {
-                console.log(error);
+                next(error);
             });
         }
     }
@@ -210,7 +210,7 @@ const getAllTutors = async (req, res, next) => {
             const data = result;
             res.status(200).json({ data, status: true });
         }).catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {
@@ -224,7 +224,7 @@ const getTutor = async (req, res, next) => {
         teacher_model_1.default.findById(id).then((result) => {
             res.status(200).json({ tutor: result, status: true });
         }).catch((error) => {
-            console.log(error, "dfds");
+            next(error);
         });
     }
     catch (error) {
@@ -241,7 +241,7 @@ const blockTutor = async (req, res, next) => {
             }).then((result) => {
                 res.status(200).json({ Message: "Blocked the tutor", status: true });
             }).catch((error) => {
-                console.log(error);
+                next(error);
             });
         }
         else {
@@ -250,7 +250,7 @@ const blockTutor = async (req, res, next) => {
             }).then((result) => {
                 res.status(200).json({ Message: "Unblocked the tutor", status: true });
             }).catch((error) => {
-                console.log(error);
+                next(error);
             });
         }
     }
@@ -266,7 +266,7 @@ const approveTutor = async (req, res, next) => {
         }).then((result) => {
             res.status(200).json({ Message: "Tutor has approved for our website", status: true });
         }).catch((error) => {
-            console.log(error);
+            next(error);
         });
     }
     catch (error) {

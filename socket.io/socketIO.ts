@@ -31,7 +31,6 @@ export const initializeSocket = async (server: any) => {
         socket.leave(userData);
       });
     });
-
     return io;
 
 };
