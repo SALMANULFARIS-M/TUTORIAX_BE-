@@ -7,6 +7,7 @@ const router = (0, express_1.Router)();
 router.post('/checkstudent', student_controller_1.checkStudent);
 router.post('/register', student_controller_1.insertStudent);
 router.post('/login', student_controller_1.verifyLogin);
+router.post('/googlelog', student_controller_1.googleLogin);
 router.post('/savepassword', student_controller_1.savePassword);
 router.post('/payment/:id', std__mw_1.isLoggin, student_controller_1.saveOrder);
 router.post('/checkcourse', std__mw_1.isLoggin, student_controller_1.checkPurchased);

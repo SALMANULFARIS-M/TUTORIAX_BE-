@@ -7,9 +7,26 @@ import Order from "../models/order_model";
 import bcrypt from "bcrypt";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import Coupon from "../models/coupon_model";
-
+import jwt_decode from "jwt-decode";
 import { Request, Response, NextFunction } from "express";
 import { ObjectId } from "mongodb";
+
+interface GoogleUser {
+  iss: string;
+  nbf: number;
+  aud: string;
+  sub: string;
+  email: string;
+  email_verified: boolean;
+  azp: string;
+  name: string;
+  picture: string;
+  given_name: string;
+  family_name: string;
+  iat: number;
+  exp: number;
+  jti: string;
+}
 //Password bcryption
 const securePassword = async (password: string): Promise<string> => {
   try {
@@ -122,6 +139,64 @@ export const verifyLogin = async (req: Request, res: Response, next: NextFunctio
       }
     } else {
       res.status(201).json({ message: "You are blocked by admin", status: false });
+    }
+  } catch (error) {
+    next(error)
+  }
+};
+
+export const googleLogin = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const decoded: GoogleUser = jwt_decode(req.body.credential);
+    const email: string = decoded.email as string;
+    const studentData = await Student.findOne({ email: email });
+    if (studentData) {
+      if (studentData?.access) {
+        const token = jwt.sign(
+          { student_id: studentData._id, type: "student" },
+          process.env.SECRET_KEY!,
+          {
+            expiresIn: "2d",
+          }
+        );
+        res.cookie("studentjwt", token, {
+          httpOnly: true,
+          maxAge: 48 * 60 * 60 * 1000,
+        });
+        studentData.token = token;
+        res.status(200).json({ token: studentData.token, status: true });
+
+      } else {
+        res.status(201).json({ message: "You are blocked by admin", status: false });
+      }
+    } else {
+      const psw: string = await securePassword(decoded.name);
+      const [firstName, lastName] = decoded.name.split(' ');
+      const student = new Student({
+        firstName:firstName,
+        lastName: lastName,
+        email: decoded.email,
+        password: psw,
+        image:decoded.picture
+      });
+      await student.save();
+      //jwt token create
+      const token: string = jwt.sign(
+        { student_id: student._id, type: "student" },
+        process.env.SECRET_KEY!,
+        {
+          expiresIn: "2d",
+        }
+      );
+      student.token = token;
+      if (student.token) {
+        res.cookie("studentjwt", token, {
+          httpOnly: true,
+          maxAge: 48 * 60 * 60 * 1000,
+        });
+        // return success and give response the jwt token
+        res.status(200).json({ token: student.token, status: true });
+      }
     }
   } catch (error) {
     next(error)
@@ -428,7 +503,7 @@ export const applyCoupon = async (req: Request, res: Response, next: NextFunctio
 export const reportVideo = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    const studentId = req.body.userId; 
+    const studentId = req.body.userId;
     const data = await Course.findOne({
       _id: req.body.courseId,
       'report.student': studentId,

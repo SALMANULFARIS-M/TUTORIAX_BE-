@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-    checkStudent, insertStudent, verifyLogin, savePassword,
+    checkStudent, insertStudent, verifyLogin, savePassword,googleLogin,
     saveOrder, checkPurchased,getAllTutors,chatConnection,getAllChats,
     getMessages,createMessage,applyCoupon,reportVideo,chatSeen,chatView,
     getStudent,updateStudent,updateImage
@@ -12,6 +12,7 @@ const router = Router();
 router.post('/checkstudent', checkStudent);
 router.post('/register', insertStudent);
 router.post('/login', verifyLogin);
+router.post('/googlelog', googleLogin);
 router.post('/savepassword', savePassword);
 router.post('/payment/:id',isLoggin, saveOrder);
 router.post('/checkcourse',isLoggin, checkPurchased)

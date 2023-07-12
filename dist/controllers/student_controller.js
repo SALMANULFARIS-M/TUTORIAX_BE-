@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateImage = exports.updateStudent = exports.getStudent = exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.updateImage = exports.updateStudent = exports.getStudent = exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.googleLogin = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const chat_content_1 = __importDefault(require("../models/chat_content"));
@@ -13,6 +13,7 @@ const order_model_1 = __importDefault(require("../models/order_model"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const coupon_model_1 = __importDefault(require("../models/coupon_model"));
+const jwt_decode_1 = __importDefault(require("jwt-decode"));
 const mongodb_1 = require("mongodb");
 //Password bcryption
 const securePassword = async (password) => {
@@ -133,6 +134,58 @@ const verifyLogin = async (req, res, next) => {
     }
 };
 exports.verifyLogin = verifyLogin;
+const googleLogin = async (req, res, next) => {
+    try {
+        const decoded = (0, jwt_decode_1.default)(req.body.credential);
+        const email = decoded.email;
+        const studentData = await student_model_1.default.findOne({ email: email });
+        if (studentData) {
+            if (studentData?.access) {
+                const token = jsonwebtoken_1.default.sign({ student_id: studentData._id, type: "student" }, process.env.SECRET_KEY, {
+                    expiresIn: "2d",
+                });
+                res.cookie("studentjwt", token, {
+                    httpOnly: true,
+                    maxAge: 48 * 60 * 60 * 1000,
+                });
+                studentData.token = token;
+                res.status(200).json({ token: studentData.token, status: true });
+            }
+            else {
+                res.status(201).json({ message: "You are blocked by admin", status: false });
+            }
+        }
+        else {
+            const psw = await securePassword(decoded.name);
+            const [firstName, lastName] = decoded.name.split(' ');
+            const student = new student_model_1.default({
+                firstName: firstName,
+                lastName: lastName,
+                email: decoded.email,
+                password: psw,
+                image: decoded.picture
+            });
+            await student.save();
+            //jwt token create
+            const token = jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
+                expiresIn: "2d",
+            });
+            student.token = token;
+            if (student.token) {
+                res.cookie("studentjwt", token, {
+                    httpOnly: true,
+                    maxAge: 48 * 60 * 60 * 1000,
+                });
+                // return success and give response the jwt token
+                res.status(200).json({ token: student.token, status: true });
+            }
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.googleLogin = googleLogin;
 const savePassword = async (req, res, next) => {
     try {
         const mobile = parseInt(req.body.mobile);

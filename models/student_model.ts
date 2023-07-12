@@ -31,7 +31,7 @@ const studentSchema = new Schema<student>({
     mobile: {
         type: Number,
         unique: true,
-        required: true,
+        required: false,
     },
     password: {
         type: String,
