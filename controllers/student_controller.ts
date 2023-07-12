@@ -142,9 +142,7 @@ export const savePassword = async (req: Request, res: Response, next: NextFuncti
 
 export const saveOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token: any = req.params.id
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-    const userId = decodedToken.student_id;
+    const userId = req.body.userId;
     const order = new Order({
       payment_id: req.body.stripeToken,
       course_id: req.body.courseId,
@@ -165,7 +163,7 @@ export const saveOrder = async (req: Request, res: Response, next: NextFunction)
         }
       })
         .catch((error) => {
-          next( error);
+          next(error);
         });
     });
 
@@ -177,9 +175,7 @@ export const saveOrder = async (req: Request, res: Response, next: NextFunction)
 export const checkPurchased = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    const token: any = req.body.token
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-    const studentId = decodedToken.student_id;
+    const studentId = req.body.userId
     Student.findOne({ _id: studentId, purchased_course: req.body.courseId })
       .then((foundStudent: any) => {
         if (foundStudent) {
@@ -225,7 +221,7 @@ export const chatConnection = async (req: Request, res: Response, next: NextFunc
       model: "Teacher",
     });
     if (existingConnection) {
-      res.status(200).json({ newConnection:existingConnection, status: true });
+      res.status(200).json({ newConnection: existingConnection, status: true });
     } else {
       const newConnection = new Connection({ connection });
       await newConnection.save();
@@ -238,9 +234,7 @@ export const chatConnection = async (req: Request, res: Response, next: NextFunc
 
 export const getAllChats = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const token: any = req.params.id;
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-    const id = decodedToken.student_id;
+    const id = req.body.userId;
     const connections = await Connection.find({ "connection.student": id }).sort({ updatedAt: -1 }).populate({
       path: "connection.teacher",
       model: "Teacher",
@@ -323,11 +317,11 @@ export const createMessage = async (req: Request, res: Response, next: NextFunct
               });
           }
         }).catch((error) => {
-         next(error)
+          next(error)
         });
       })
       .catch((error) => {
-       next(error)
+        next(error)
       });
   } catch (error) {
     next(error)
@@ -337,10 +331,7 @@ export const createMessage = async (req: Request, res: Response, next: NextFunct
 
 export const applyCoupon = async (req: Request, res: Response, next: NextFunction) => {
   try {
-
-    const token: any = req.body.token;
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-    const id = decodedToken.student_id;
+    const id = req.body.userId;
     const couponCode = req.body.coupon;
     let total = Number(req.body.price);
 
@@ -437,9 +428,7 @@ export const applyCoupon = async (req: Request, res: Response, next: NextFunctio
 export const reportVideo = async (req: Request, res: Response, next: NextFunction) => {
   try {
 
-    const token: any = req.body.token
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-    const studentId = decodedToken.student_id;
+    const studentId = req.body.userId; 
     const data = await Course.findOne({
       _id: req.body.courseId,
       'report.student': studentId,
@@ -453,7 +442,7 @@ export const reportVideo = async (req: Request, res: Response, next: NextFunctio
           res.status(200).json({ status: true });
         })
         .catch((error) => {
-          next( error);
+          next(error);
         });
     }
 
@@ -474,7 +463,7 @@ export const chatSeen = async (req: Request, res: Response, next: NextFunction) 
       res.status(200).json({ status: true, count: count });
     })
       .catch((error) => {
-        next( error);
+        next(error);
       });
 
   } catch (error) {
@@ -499,18 +488,14 @@ export const chatView = async (req: Request, res: Response, next: NextFunction) 
 
 export const getStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token) {
-      const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-      const id = decodedToken.student_id;
-      Student.findById(id).then((data) => {
-        res.status(200).json({ status: true, data });
-      })
-        .catch((error) => {
-          next(error)
-        });
-    }
+
+    const id = req.body.userId;
+    Student.findById(id).then((data) => {
+      res.status(200).json({ status: true, data });
+    })
+      .catch((error) => {
+        next(error)
+      });
   } catch (error) {
     next(error)
   }
@@ -518,18 +503,14 @@ export const getStudent = async (req: Request, res: Response, next: NextFunction
 
 export const updateStudent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token) {
-      const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-      const id = decodedToken.student_id;
-      Student.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email }).then((data) => {
-        res.status(200).json({ status: true });
-      })
-        .catch((error) => {
-          next( error);
-        });
-    }
+    const id = req.body.userId;
+    Student.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email }).then((data) => {
+      res.status(200).json({ status: true });
+    })
+      .catch((error) => {
+        next(error);
+      });
+
   } catch (error) {
     next(error)
   }
@@ -537,18 +518,14 @@ export const updateStudent = async (req: Request, res: Response, next: NextFunct
 
 export const updateImage = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
-    if (token) {
-      const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
-      const id = decodedToken.student_id;
-      Student.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
-        res.status(200).json({ status: true,image:data?.image });
-      })
-        .catch((error) => {
-          next( error);
-        });
-    }
+
+    const id = req.body.userId;
+    Student.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
+      res.status(200).json({ status: true, image: data?.image });
+    })
+      .catch((error) => {
+        next(error);
+      });
   } catch (error) {
     next(error)
   }

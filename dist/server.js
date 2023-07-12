@@ -50,5 +50,5 @@ mongoose_1.default
     next(err);
 });
 function next(err) {
-    throw new Error("Function not implemented.");
+    throw new Error(err.message);
 }

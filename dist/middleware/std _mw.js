@@ -1,5 +1,10 @@
+"use strict";
 // import { NextFunction } from "express";
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isLoggin = void 0;
 // export const isLogin = async (req: Request, res: Response, next: NextFunction) => {
 //     try {
 //         const authHeader = req.headers.authorization;
@@ -13,49 +18,35 @@
 //        next(error);
 //       }
 //   };
-
-
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { Request, Response, NextFunction } from "express";
-interface ITokenPayload {
-    iat: number;
-    exp: number;
-    student_id: string;
-  }
-export const isLoggin = async (req: Request, res: Response, next: NextFunction) => {
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const isLoggin = async (req, res, next) => {
     try {
-        const authHeader: string | undefined = req.headers.authorization;
-        const token: string | undefined = authHeader && authHeader.split(' ')[1];
-
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
         if (!token) {
             return res.status(401).json({
                 message: "auth failed",
                 Status: false,
             });
-        } else {
-            jwt.verify(
-                  token,
-                  process.env.SECRET_KEY as string,
-                  (err: any | null, decoded: any) => {
-                    if (err) {                    
-                      return res.status(401).json({
+        }
+        else {
+            jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY, (err, decoded) => {
+                if (err) {
+                    return res.status(401).json({
                         message: "auth failed",
                         Status: false,
-                      });
-                    } else {
-                      const { student_id } = decoded as ITokenPayload;
-                      req.body.userId = student_id;
-                      next();
-                    }
-                  }
-        
-                );
+                    });
+                }
+                else {
+                    const { student_id } = decoded;
+                    req.body.userId = student_id;
+                    next();
+                }
+            });
             // const decodedToken = jwt.verify(token, process.env.SECRET_KEY!) as JwtPayload & { student_id: string };
             // req.body.userId = decodedToken.student_id;;
             // next();
         }
-
-
         // if (!authHeader) {
         //   return res.status(401).send({
         //     message: "auth failed",
@@ -78,12 +69,13 @@ export const isLoggin = async (req: Request, res: Response, next: NextFunction) 
         //       next();
         //     }
         //   }
-
         // );
-    } catch (error) {
+    }
+    catch (error) {
         return res.status(401).send({
             message: "auth failed",
             success: false,
         });
     }
 };
+exports.isLoggin = isLoggin;

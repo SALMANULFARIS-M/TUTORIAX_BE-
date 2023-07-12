@@ -55,5 +55,5 @@ mongoose
   });
 
 function next(err: Error) {
-  throw new Error("Function not implemented.");
+  throw new Error(err.message);
 }

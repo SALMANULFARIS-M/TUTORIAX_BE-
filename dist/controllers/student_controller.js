@@ -148,9 +148,7 @@ const savePassword = async (req, res, next) => {
 exports.savePassword = savePassword;
 const saveOrder = async (req, res, next) => {
     try {
-        const token = req.params.id;
-        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        const userId = decodedToken.student_id;
+        const userId = req.body.userId;
         const order = new order_model_1.default({
             payment_id: req.body.stripeToken,
             course_id: req.body.courseId,
@@ -178,9 +176,7 @@ const saveOrder = async (req, res, next) => {
 exports.saveOrder = saveOrder;
 const checkPurchased = async (req, res, next) => {
     try {
-        const token = req.body.token;
-        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        const studentId = decodedToken.student_id;
+        const studentId = req.body.userId;
         student_model_1.default.findOne({ _id: studentId, purchased_course: req.body.courseId })
             .then((foundStudent) => {
             if (foundStudent) {
@@ -242,9 +238,7 @@ const chatConnection = async (req, res, next) => {
 exports.chatConnection = chatConnection;
 const getAllChats = async (req, res, next) => {
     try {
-        const token = req.params.id;
-        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        const id = decodedToken.student_id;
+        const id = req.body.userId;
         const connections = await chat_connection_1.default.find({ "connection.student": id }).sort({ updatedAt: -1 }).populate({
             path: "connection.teacher",
             model: "Teacher",
@@ -341,9 +335,7 @@ const createMessage = async (req, res, next) => {
 exports.createMessage = createMessage;
 const applyCoupon = async (req, res, next) => {
     try {
-        const token = req.body.token;
-        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        const id = decodedToken.student_id;
+        const id = req.body.userId;
         const couponCode = req.body.coupon;
         let total = Number(req.body.price);
         coupon_model_1.default.findOne({
@@ -438,9 +430,7 @@ const applyCoupon = async (req, res, next) => {
 exports.applyCoupon = applyCoupon;
 const reportVideo = async (req, res, next) => {
     try {
-        const token = req.body.token;
-        const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        const studentId = decodedToken.student_id;
+        const studentId = req.body.userId;
         const data = await course_model_1.default.findOne({
             _id: req.body.courseId,
             'report.student': studentId,
@@ -502,18 +492,13 @@ const chatView = async (req, res, next) => {
 exports.chatView = chatView;
 const getStudent = async (req, res, next) => {
     try {
-        const authHeader = req.headers.authorization;
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token) {
-            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-            const id = decodedToken.student_id;
-            student_model_1.default.findById(id).then((data) => {
-                res.status(200).json({ status: true, data });
-            })
-                .catch((error) => {
-                next(error);
-            });
-        }
+        const id = req.body.userId;
+        student_model_1.default.findById(id).then((data) => {
+            res.status(200).json({ status: true, data });
+        })
+            .catch((error) => {
+            next(error);
+        });
     }
     catch (error) {
         next(error);
@@ -522,18 +507,13 @@ const getStudent = async (req, res, next) => {
 exports.getStudent = getStudent;
 const updateStudent = async (req, res, next) => {
     try {
-        const authHeader = req.headers.authorization;
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token) {
-            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-            const id = decodedToken.student_id;
-            student_model_1.default.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email }).then((data) => {
-                res.status(200).json({ status: true });
-            })
-                .catch((error) => {
-                next(error);
-            });
-        }
+        const id = req.body.userId;
+        student_model_1.default.findByIdAndUpdate(id, { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email }).then((data) => {
+            res.status(200).json({ status: true });
+        })
+            .catch((error) => {
+            next(error);
+        });
     }
     catch (error) {
         next(error);
@@ -542,18 +522,13 @@ const updateStudent = async (req, res, next) => {
 exports.updateStudent = updateStudent;
 const updateImage = async (req, res, next) => {
     try {
-        const authHeader = req.headers.authorization;
-        const token = authHeader && authHeader.split(' ')[1];
-        if (token) {
-            const decodedToken = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-            const id = decodedToken.student_id;
-            student_model_1.default.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
-                res.status(200).json({ status: true, image: data?.image });
-            })
-                .catch((error) => {
-                next(error);
-            });
-        }
+        const id = req.body.userId;
+        student_model_1.default.findByIdAndUpdate(id, { image: req.body.image }).then((data) => {
+            res.status(200).json({ status: true, image: data?.image });
+        })
+            .catch((error) => {
+            next(error);
+        });
     }
     catch (error) {
         next(error);
