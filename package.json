@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"nodemon dist/server.js",
+    "build":"npm i",
     "start": "nodemon dist/server.js"
+
   },
   "keywords": [],
   "author": "",
