@@ -17,7 +17,7 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     credentials: true,
-    origin: [process.env.ORIGIN],
+    origin: [process.env.ORIGIN1, process.env.ORIGIN2],
 }));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));

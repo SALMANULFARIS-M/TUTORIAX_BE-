@@ -6,7 +6,7 @@ const initializeSocket = async (server) => {
     const io = new socket_io_1.Server(server, {
         pingTimeout: 60000,
         cors: {
-            origin: [process.env.ORIGIN],
+            origin: [process.env.ORIGIN1, process.env.ORIGIN2],
         },
     });
     io.on("connection", (socket) => {
