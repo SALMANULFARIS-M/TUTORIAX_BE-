@@ -4,7 +4,7 @@ export const initializeSocket = async (server: any) => {
     const io = new Server(server,{
         pingTimeout: 60000,
         cors: {
-            origin: [process.env.ORIGIN as string],
+            origin: [process.env.ORIGIN1 as string, process.env.ORIGIN2 as string],
         },
     });
 

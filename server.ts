@@ -16,7 +16,7 @@ const app: Application = express()
 app.use(
   cors({
     credentials: true,
-    origin: [process.env.ORIGIN as string],
+    origin: [process.env.ORIGIN1 as string, process.env.ORIGIN2 as string],
   })
 );
 app.use(bodyParser.json());
