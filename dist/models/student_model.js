@@ -20,7 +20,6 @@ const studentSchema = new mongoose_1.Schema({
         type: Number,
         required: false,
         default: null,
-        unique: true,
     },
     password: {
         type: String,
