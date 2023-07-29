@@ -166,25 +166,24 @@ const googleLogin = async (req, res, next) => {
                 image: decoded.picture
             });
             await student.save().then((data) => {
-                console.log(data);
+                //jwt token create
+                const token = jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
+                    expiresIn: "2d",
+                });
+                student.token = token;
+                if (student.token) {
+                    res.cookie("studentjwt", token, {
+                        httpOnly: true,
+                        maxAge: 48 * 60 * 60 * 1000,
+                    });
+                    // return success and give response the jwt token
+                    res.status(200).json({ token: student.token, status: true });
+                }
             })
                 .catch((error) => {
                 console.log(error);
             });
             ;
-            //jwt token create
-            const token = jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
-                expiresIn: "2d",
-            });
-            student.token = token;
-            if (student.token) {
-                res.cookie("studentjwt", token, {
-                    httpOnly: true,
-                    maxAge: 48 * 60 * 60 * 1000,
-                });
-                // return success and give response the jwt token
-                res.status(200).json({ token: student.token, status: true });
-            }
         }
     }
     catch (error) {
