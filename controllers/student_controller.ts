@@ -182,7 +182,7 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
         console.log(data);
       })
         .catch((error) => {
-          console.log(error);
+          console.log(error,"sdafhadjferhdfijjnerjernjerjntrjnejmnerjerjmerjm");
         });;
       //jwt token create
       const token: string = jwt.sign(
@@ -203,7 +203,7 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
       }
     }
   } catch (error) {
-    console.log(error);
+    console.log(error,"eroor");
     
     next(error)
   }

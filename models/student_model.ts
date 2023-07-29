@@ -30,7 +30,7 @@ const studentSchema = new Schema<student>({
     },
     mobile: {
         type: Number,
-        required: true,
+        required: false,
         default: null,
         unique: true,
     },

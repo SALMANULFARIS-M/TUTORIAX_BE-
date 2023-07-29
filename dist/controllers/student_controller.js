@@ -169,7 +169,7 @@ const googleLogin = async (req, res, next) => {
                 console.log(data);
             })
                 .catch((error) => {
-                console.log(error);
+                console.log(error, "sdafhadjferhdfijjnerjernjerjntrjnejmnerjerjmerjm");
             });
             ;
             //jwt token create
@@ -188,7 +188,7 @@ const googleLogin = async (req, res, next) => {
         }
     }
     catch (error) {
-        console.log(error);
+        console.log(error, "eroor");
         next(error);
     }
 };
