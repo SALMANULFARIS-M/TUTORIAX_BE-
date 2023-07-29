@@ -165,7 +165,6 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
         });
         studentData.token = token;
         res.status(200).json({ token: studentData.token, status: true });
-
       } else {
         res.status(201).json({ message: "You are blocked by admin", status: false });
       }
@@ -179,7 +178,12 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
         password: psw,
         image:decoded.picture
       });
-      await student.save();
+      await student.save().then((data) => {
+        console.log(data);
+      })
+        .catch((error) => {
+          console.log(error);
+        });;
       //jwt token create
       const token: string = jwt.sign(
         { student_id: student._id, type: "student" },
@@ -199,6 +203,8 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
       }
     }
   } catch (error) {
+    console.log(error);
+    
     next(error)
   }
 };

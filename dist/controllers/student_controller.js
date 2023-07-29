@@ -165,7 +165,13 @@ const googleLogin = async (req, res, next) => {
                 password: psw,
                 image: decoded.picture
             });
-            await student.save();
+            await student.save().then((data) => {
+                console.log(data);
+            })
+                .catch((error) => {
+                console.log(error);
+            });
+            ;
             //jwt token create
             const token = jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
                 expiresIn: "2d",
@@ -182,6 +188,7 @@ const googleLogin = async (req, res, next) => {
         }
     }
     catch (error) {
+        console.log(error);
         next(error);
     }
 };
