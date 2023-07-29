@@ -136,7 +136,6 @@ const verifyLogin = async (req, res, next) => {
 exports.verifyLogin = verifyLogin;
 const googleLogin = async (req, res, next) => {
     try {
-          console.log(req.body.credential,"cred");
         const decoded = (0, jwt_decode_1.default)(req.body.credential);
         const email = decoded.email;
         const studentData = await student_model_1.default.findOne({ email: email });
@@ -150,7 +149,6 @@ const googleLogin = async (req, res, next) => {
                     maxAge: 48 * 60 * 60 * 1000,
                 });
                 studentData.token = token;
-                  console.log(studentData,"salman");
                 res.status(200).json({ token: studentData.token, status: true });
             }
             else {
@@ -178,14 +176,12 @@ const googleLogin = async (req, res, next) => {
                     httpOnly: true,
                     maxAge: 48 * 60 * 60 * 1000,
                 });
-                  console.log(student,"sal");
                 // return success and give response the jwt token
                 res.status(200).json({ token: student.token, status: true });
             }
         }
     }
     catch (error) {
-        console.log(error)
         next(error);
     }
 };
