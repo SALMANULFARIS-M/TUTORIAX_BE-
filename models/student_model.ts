@@ -32,7 +32,8 @@ const studentSchema = new Schema<student>({
         type: Number,
         required: false,
         default: null,
-    },
+        unique: false, 
+      },
     password: {
         type: String,
         required: true,
