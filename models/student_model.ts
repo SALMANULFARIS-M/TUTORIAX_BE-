@@ -5,7 +5,7 @@ interface student extends Document {
     firstName: string;
     lastName: string;
     email: string;
-    mobile: number;
+    mobile: number | null;
     password: string;
     image: string;
     purchased_course: ObjectId[];
@@ -30,8 +30,9 @@ const studentSchema = new Schema<student>({
     },
     mobile: {
         type: Number,
+        required: true,
+        default: null,
         unique: true,
-        required: false,
     },
     password: {
         type: String,
@@ -43,9 +44,9 @@ const studentSchema = new Schema<student>({
     },
     purchased_course: {
         type: [ObjectId],
-        ref:"Course",
+        ref: "Course",
         required: false,
-      },
+    },
     token: {
         type: String
     },
@@ -53,9 +54,9 @@ const studentSchema = new Schema<student>({
         type: Boolean,
         default: true
     },
-    couponsApplied:{
-        type:[ObjectId],
-        required:false,
+    couponsApplied: {
+        type: [ObjectId],
+        required: false,
     },
 
 },
