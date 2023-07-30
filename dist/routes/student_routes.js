@@ -23,4 +23,5 @@ router.patch('/chatview/:id', student_controller_1.chatView);
 router.get('/getstudent', std__mw_1.isLoggin, student_controller_1.getStudent);
 router.patch('/editstudent', std__mw_1.isLoggin, student_controller_1.updateStudent);
 router.patch('/editimage', std__mw_1.isLoggin, student_controller_1.updateImage);
+router.patch('/newsletter', student_controller_1.newsLetter);
 exports.default = router;

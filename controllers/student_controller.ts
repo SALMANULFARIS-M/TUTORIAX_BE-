@@ -171,14 +171,15 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
     } else {
       const psw: string = await securePassword(decoded.name);
       const [firstName, lastName] = decoded.name.split(' ');
-      const student = new Student({
+
+      const student = await new Student({
         firstName: firstName,
         lastName: lastName,
         email: decoded.email,
         password: psw,
         image: decoded.picture
       });
-      await student.save().then((data) => {
+      student.save().then((data) => {
         //jwt token create
         const token: string = jwt.sign(
           { student_id: student._id, type: "student" },
@@ -199,6 +200,7 @@ export const googleLogin = async (req: Request, res: Response, next: NextFunctio
       })
         .catch((error) => {
           console.log(error);
+          next(error)
         });;
 
     }
@@ -605,6 +607,17 @@ export const updateImage = async (req: Request, res: Response, next: NextFunctio
       .catch((error) => {
         next(error);
       });
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const newsLetter = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const mail = req.body.mail;
+    if (mail) {
+      res.status(200).json({ status: true });
+    }
   } catch (error) {
     next(error)
   }

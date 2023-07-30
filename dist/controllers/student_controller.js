@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateImage = exports.updateStudent = exports.getStudent = exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.googleLogin = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
+exports.newsLetter = exports.updateImage = exports.updateStudent = exports.getStudent = exports.chatView = exports.chatSeen = exports.reportVideo = exports.applyCoupon = exports.createMessage = exports.getMessages = exports.getAllChats = exports.chatConnection = exports.getAllTutors = exports.checkPurchased = exports.saveOrder = exports.savePassword = exports.googleLogin = exports.verifyLogin = exports.insertStudent = exports.checkStudent = void 0;
 const student_model_1 = __importDefault(require("../models/student_model"));
 const chat_connection_1 = __importDefault(require("../models/chat_connection"));
 const chat_content_1 = __importDefault(require("../models/chat_content"));
@@ -158,14 +158,14 @@ const googleLogin = async (req, res, next) => {
         else {
             const psw = await securePassword(decoded.name);
             const [firstName, lastName] = decoded.name.split(' ');
-            const student = new student_model_1.default({
+            const student = await new student_model_1.default({
                 firstName: firstName,
                 lastName: lastName,
                 email: decoded.email,
                 password: psw,
                 image: decoded.picture
             });
-            await student.save().then((data) => {
+            student.save().then((data) => {
                 //jwt token create
                 const token = jsonwebtoken_1.default.sign({ student_id: student._id, type: "student" }, process.env.SECRET_KEY, {
                     expiresIn: "2d",
@@ -182,6 +182,7 @@ const googleLogin = async (req, res, next) => {
             })
                 .catch((error) => {
                 console.log(error);
+                next(error);
             });
             ;
         }
@@ -593,3 +594,15 @@ const updateImage = async (req, res, next) => {
     }
 };
 exports.updateImage = updateImage;
+const newsLetter = async (req, res, next) => {
+    try {
+        const mail = req.body.mail;
+        if (mail) {
+            res.status(200).json({ status: true });
+        }
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.newsLetter = newsLetter;

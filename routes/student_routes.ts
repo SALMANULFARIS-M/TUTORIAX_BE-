@@ -3,7 +3,7 @@ import {
     checkStudent, insertStudent, verifyLogin, savePassword,googleLogin,
     saveOrder, checkPurchased,getAllTutors,chatConnection,getAllChats,
     getMessages,createMessage,applyCoupon,reportVideo,chatSeen,chatView,
-    getStudent,updateStudent,updateImage
+    getStudent,updateStudent,updateImage,newsLetter
 } from "../controllers/student_controller";
 import { isLoggin } from "../middleware/std _mw";
 
@@ -28,6 +28,7 @@ router.patch('/chatview/:id',chatView);
 router.get('/getstudent',isLoggin,getStudent);
 router.patch('/editstudent',isLoggin,updateStudent);
 router.patch('/editimage',isLoggin,updateImage);
+router.patch('/newsletter',newsLetter);
 
 
 export default router;
